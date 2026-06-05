@@ -1,0 +1,4696 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EU-Klimagipfel · Escape-Room</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,400&family=IBM+Plex+Sans:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   EU-KLIMAGIPFEL — Escape Room
+   PoWi E2.3 · Sitzung 2 · Selbsterarbeitung
+   ============================================================ */
+
+:root {
+  --c-bg-deep:      #060c1a;
+  --c-bg-mid:       #0a1428;
+  --c-bg-card:      #0f1f3a;
+  --c-bg-card-hi:   #16294a;
+  --c-text:         #f4efe6;
+  --c-text-mute:    #a8b3c7;
+  --c-text-dim:     #6b7790;
+  --c-gold:         #d4af37;
+  --c-gold-bright:  #ffd700;
+  --c-gold-glow:    #fcbb28;
+  --c-teal:         #2fb8a0;
+  --c-teal-deep:    #1a6e62;
+  --c-blue:         #4f8edb;
+  --c-success:      #5fb47a;
+  --c-success-bg:   rgba(95, 180, 122, 0.15);
+  --c-error:        #e07856;
+  --c-error-bg:     rgba(224, 120, 86, 0.15);
+  --c-border:       rgba(212, 175, 55, 0.25);
+  --c-border-soft:  rgba(244, 239, 230, 0.08);
+
+  --font-display: 'Fraunces', 'Cormorant Garamond', Georgia, serif;
+  --font-body:    'IBM Plex Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+  --font-mono:    'JetBrains Mono', 'Menlo', 'Courier New', monospace;
+
+  --shadow-soft:   0 4px 24px rgba(0, 0, 0, 0.35);
+  --shadow-card:   0 8px 40px rgba(0, 0, 0, 0.55), 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-glow:   0 0 40px rgba(212, 175, 55, 0.3);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: var(--c-bg-deep);
+  color: var(--c-text);
+  font-family: var(--font-body);
+  font-weight: 400;
+  line-height: 1.6;
+  min-height: 100vh;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Animated background — subtle aurora effect */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  background:
+    radial-gradient(ellipse at 15% 20%, rgba(47, 184, 160, 0.08) 0%, transparent 50%),
+    radial-gradient(ellipse at 85% 80%, rgba(212, 175, 55, 0.07) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 100%, rgba(79, 142, 219, 0.05) 0%, transparent 60%),
+    linear-gradient(180deg, var(--c-bg-deep) 0%, var(--c-bg-mid) 100%);
+  pointer-events: none;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  background-image:
+    radial-gradient(circle at 1px 1px, rgba(244, 239, 230, 0.03) 1px, transparent 0);
+  background-size: 40px 40px;
+  pointer-events: none;
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(6, 12, 26, 0.85);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--c-border-soft);
+  padding: 14px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.topbar-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  letter-spacing: 0.02em;
+  color: var(--c-gold);
+}
+
+.topbar-brand .stars-icon {
+  width: 26px;
+  height: 26px;
+  fill: var(--c-gold);
+}
+
+.topbar-progress {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.seal {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 1.5px solid var(--c-border-soft);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--c-text-dim);
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+.seal.active {
+  border-color: var(--c-gold);
+  color: var(--c-gold);
+  box-shadow: 0 0 12px rgba(212, 175, 55, 0.4);
+}
+
+.seal.solved {
+  background: var(--c-gold);
+  border-color: var(--c-gold);
+  color: var(--c-bg-deep);
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 13px;
+  transform: rotate(-3deg);
+}
+
+.seal.solved::after {
+  content: '';
+  position: absolute;
+  inset: -3px;
+  border-radius: 50%;
+  border: 1px solid var(--c-gold);
+  opacity: 0.4;
+}
+
+.main {
+  flex: 1;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 60px 24px 80px;
+}
+
+.site-footer {
+  text-align: center;
+  font-size: 11px;
+  color: var(--c-text-dim);
+  padding: 18px 12px 24px;
+  border-top: 1px solid var(--c-border-soft);
+  font-family: var(--font-mono);
+  letter-spacing: 0.04em;
+}
+
+.screen {
+  width: 100%;
+  max-width: 900px;
+  animation: screenIn 0.7s cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+@keyframes screenIn {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   TYPOGRAPHY
+   ============================================================ */
+
+h1, h2, h3 {
+  font-family: var(--font-display);
+  font-weight: 600;
+  line-height: 1.15;
+  color: var(--c-text);
+  letter-spacing: -0.02em;
+}
+
+.kicker {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--c-gold);
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.kicker::before {
+  content: '';
+  display: inline-block;
+  width: 28px;
+  height: 1px;
+  background: var(--c-gold);
+}
+
+.title-mega {
+  font-size: clamp(48px, 8vw, 84px);
+  font-weight: 800;
+  line-height: 0.95;
+  margin-bottom: 24px;
+  letter-spacing: -0.04em;
+}
+
+.title-mega em {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--c-gold);
+}
+
+.lede {
+  font-family: var(--font-display);
+  font-size: clamp(18px, 2vw, 22px);
+  font-weight: 400;
+  line-height: 1.5;
+  color: var(--c-text-mute);
+  max-width: 60ch;
+  margin-bottom: 32px;
+}
+
+.section-title {
+  font-size: clamp(32px, 4vw, 48px);
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+
+.section-subtitle {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--c-text-mute);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+}
+
+p { margin-bottom: 16px; }
+p.body-lg { font-size: 17px; line-height: 1.7; }
+
+/* ============================================================
+   COMPONENTS
+   ============================================================ */
+
+.card {
+  background: linear-gradient(165deg, var(--c-bg-card) 0%, var(--c-bg-card-hi) 100%);
+  border: 1px solid var(--c-border-soft);
+  border-radius: 4px;
+  padding: 36px 40px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-card);
+  position: relative;
+}
+
+.card-accent {
+  position: relative;
+}
+
+.card-accent::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 24px;
+  bottom: 24px;
+  width: 3px;
+  background: var(--c-gold);
+}
+
+.briefing {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 18px;
+  line-height: 1.7;
+  color: var(--c-text);
+  padding-left: 20px;
+}
+
+.briefing .speaker {
+  display: block;
+  font-family: var(--font-mono);
+  font-style: normal;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--c-gold);
+  margin-bottom: 8px;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 28px;
+  border: none;
+  border-radius: 2px;
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: var(--c-gold);
+  color: var(--c-bg-deep);
+}
+
+.btn-primary:hover {
+  background: var(--c-gold-bright);
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(212, 175, 55, 0.35);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--c-text);
+  border: 1px solid var(--c-border);
+}
+
+.btn-ghost:hover {
+  border-color: var(--c-gold);
+  color: var(--c-gold);
+}
+
+.btn-arrow::after {
+  content: '→';
+  font-family: var(--font-mono);
+  font-size: 16px;
+}
+
+.btn-row {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+}
+
+/* ============================================================
+   PUZZLE COMPONENTS
+   ============================================================ */
+
+/* Multi-select cards (Room 1) */
+.measure-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin: 24px 0;
+}
+
+@media (max-width: 600px) {
+  .measure-grid { grid-template-columns: 1fr; }
+}
+
+.measure-card {
+  padding: 18px 20px;
+  background: rgba(15, 31, 58, 0.5);
+  border: 1.5px solid var(--c-border-soft);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+  line-height: 1.5;
+  user-select: none;
+  position: relative;
+  text-align: left;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  color: var(--c-text);
+}
+
+.measure-card:hover {
+  border-color: var(--c-gold);
+  background: rgba(15, 31, 58, 0.8);
+  transform: translateY(-1px);
+}
+
+.measure-card.selected {
+  border-color: var(--c-gold);
+  background: rgba(212, 175, 55, 0.1);
+  box-shadow: 0 0 0 1px var(--c-gold);
+}
+
+.measure-card .checkbox {
+  width: 18px;
+  height: 18px;
+  border: 1.5px solid var(--c-text-dim);
+  border-radius: 2px;
+  flex-shrink: 0;
+  margin-top: 1px;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.measure-card.selected .checkbox {
+  background: var(--c-gold);
+  border-color: var(--c-gold);
+}
+
+.measure-card.selected .checkbox::after {
+  content: '✓';
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--c-bg-deep);
+  font-weight: 800;
+  font-size: 14px;
+}
+
+.measure-card.feedback-correct {
+  border-color: var(--c-success);
+  background: var(--c-success-bg);
+  box-shadow: 0 0 0 1px var(--c-success);
+}
+
+.measure-card.feedback-correct .checkbox {
+  background: var(--c-success);
+  border-color: var(--c-success);
+}
+
+.measure-card.feedback-incorrect {
+  border-color: var(--c-error);
+  background: var(--c-error-bg);
+  box-shadow: 0 0 0 1px var(--c-error);
+}
+
+.measure-card.feedback-incorrect .checkbox {
+  background: var(--c-error);
+  border-color: var(--c-error);
+}
+
+.measure-card.feedback-missed {
+  border-color: var(--c-gold);
+  background: rgba(212, 175, 55, 0.08);
+}
+
+.feedback-hint {
+  display: none;
+  margin-top: 8px;
+  padding: 8px 10px;
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 2px;
+  font-size: 12.5px;
+  line-height: 1.5;
+  color: var(--c-text-mute);
+}
+
+.measure-card.feedback-correct .feedback-hint,
+.measure-card.feedback-incorrect .feedback-hint,
+.measure-card.feedback-missed .feedback-hint {
+  display: block;
+}
+
+/* Matching pairs (Room 2) */
+.matching-board {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px 32px;
+  margin: 24px 0;
+  position: relative;
+}
+
+@media (max-width: 600px) {
+  .matching-board { grid-template-columns: 1fr; gap: 12px; }
+}
+
+.match-card {
+  padding: 16px 18px;
+  background: rgba(15, 31, 58, 0.6);
+  border: 1.5px solid var(--c-border-soft);
+  border-radius: 3px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 13.5px;
+  line-height: 1.5;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-height: 64px;
+  color: var(--c-text);
+}
+
+.match-card .match-marker {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(212, 175, 55, 0.15);
+  border: 1px solid var(--c-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--c-gold);
+  flex-shrink: 0;
+}
+
+.match-card:hover {
+  border-color: var(--c-gold);
+  background: rgba(15, 31, 58, 0.9);
+}
+
+.match-card.selected {
+  border-color: var(--c-gold-bright);
+  background: rgba(212, 175, 55, 0.12);
+  box-shadow: 0 0 0 1px var(--c-gold-bright);
+}
+
+.match-card.paired {
+  border-color: var(--c-teal);
+  background: rgba(47, 184, 160, 0.1);
+  cursor: default;
+}
+
+.match-card.paired .match-marker {
+  background: var(--c-teal);
+  color: var(--c-bg-deep);
+  border-color: var(--c-teal);
+}
+
+.match-card.correct-pair {
+  border-color: var(--c-success);
+  background: var(--c-success-bg);
+}
+
+.match-card.correct-pair .match-marker {
+  background: var(--c-success);
+  border-color: var(--c-success);
+  color: var(--c-bg-deep);
+}
+
+.match-card.wrong-pair {
+  border-color: var(--c-error);
+  background: var(--c-error-bg);
+}
+
+.match-card.wrong-pair .match-marker {
+  background: var(--c-error);
+  border-color: var(--c-error);
+  color: var(--c-bg-deep);
+}
+
+.match-strong { font-family: var(--font-display); font-weight: 600; font-size: 16px; }
+
+/* Sort cards into buckets (Rooms 3, 5, 6) */
+.bucket-area {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-top: 24px;
+}
+
+@media (max-width: 600px) {
+  .bucket-area { grid-template-columns: 1fr; }
+}
+
+.bucket-area.quad {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+@media (min-width: 900px) {
+  .bucket-area.quad { grid-template-columns: repeat(4, 1fr); }
+}
+
+.bucket {
+  min-height: 160px;
+  background: rgba(15, 31, 58, 0.4);
+  border: 1.5px dashed var(--c-border-soft);
+  border-radius: 3px;
+  padding: 16px 14px;
+  transition: all 0.2s ease;
+}
+
+.bucket.target {
+  border-color: var(--c-gold);
+  background: rgba(212, 175, 55, 0.08);
+  box-shadow: 0 0 0 1px var(--c-gold);
+}
+
+.bucket-label {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--c-gold);
+  margin-bottom: 4px;
+  letter-spacing: 0.02em;
+}
+
+.bucket-desc {
+  font-size: 11.5px;
+  color: var(--c-text-mute);
+  margin-bottom: 14px;
+  line-height: 1.4;
+  font-style: italic;
+}
+
+.bucket-items {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 60px;
+}
+
+.cards-pool {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 16px 14px;
+  background: rgba(6, 12, 26, 0.5);
+  border: 1px solid var(--c-border-soft);
+  border-radius: 3px;
+  min-height: 90px;
+}
+
+.cards-pool-label {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+  margin-bottom: 4px;
+}
+
+.sort-card {
+  padding: 8px 14px;
+  background: rgba(22, 41, 74, 0.9);
+  border: 1px solid var(--c-border-soft);
+  border-radius: 2px;
+  font-size: 13px;
+  line-height: 1.3;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: var(--c-text);
+  user-select: none;
+  max-width: 100%;
+}
+
+.sort-card:hover {
+  border-color: var(--c-gold);
+  transform: translateY(-1px);
+}
+
+.sort-card.selected {
+  border-color: var(--c-gold-bright);
+  background: rgba(212, 175, 55, 0.15);
+  box-shadow: 0 0 0 1px var(--c-gold-bright);
+  transform: translateY(-1px);
+}
+
+.sort-card.correct {
+  border-color: var(--c-success);
+  background: var(--c-success-bg);
+}
+
+.sort-card.incorrect {
+  border-color: var(--c-error);
+  background: var(--c-error-bg);
+}
+
+.sort-card.placed {
+  width: 100%;
+  display: block;
+}
+
+/* Lückentext / Fill in numbers (Room 4) */
+.cloze-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin: 24px 0;
+}
+
+.cloze-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(15, 31, 58, 0.5);
+  border: 1px solid var(--c-border-soft);
+  border-radius: 3px;
+  flex-wrap: wrap;
+}
+
+.cloze-text {
+  font-size: 14.5px;
+  line-height: 1.5;
+  flex: 1;
+  min-width: 240px;
+  color: var(--c-text);
+}
+
+.cloze-text strong { color: var(--c-gold); font-weight: 600; }
+
+.cloze-input {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  width: 110px;
+  padding: 8px 12px;
+  background: rgba(6, 12, 26, 0.7);
+  border: 1.5px solid var(--c-border);
+  border-radius: 2px;
+  color: var(--c-gold-bright);
+  text-align: center;
+  transition: all 0.2s ease;
+}
+
+.cloze-input:focus {
+  outline: none;
+  border-color: var(--c-gold-bright);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
+}
+
+.cloze-input.correct {
+  border-color: var(--c-success);
+  background: var(--c-success-bg);
+  color: var(--c-success);
+}
+
+.cloze-input.incorrect {
+  border-color: var(--c-error);
+  background: var(--c-error-bg);
+  color: var(--c-error);
+}
+
+.cloze-unit {
+  font-family: var(--font-mono);
+  font-size: 13px;
+  color: var(--c-text-mute);
+  margin-left: -4px;
+}
+
+/* Video embed (Bibliotheken 2 & 4) */
+.video-wrap {
+  position: relative;
+  width: 100%;
+  padding-top: 56.25%;
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+  background: #000;
+  margin: 8px 0;
+}
+.video-wrap iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+}
+.fallback-line {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 16px;
+  font-size: 14px;
+  color: var(--c-text-mute);
+}
+
+/* Dropdown cloze (Raum 4, Teil 2) */
+.cloze-prose {
+  font-size: 15.5px;
+  line-height: 2.5;
+  color: var(--c-text);
+}
+.cloze-select {
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--c-gold-bright);
+  background: rgba(6, 12, 26, 0.7);
+  border: 1.5px solid var(--c-border);
+  border-radius: 3px;
+  padding: 4px 8px;
+  margin: 0 2px;
+}
+.cloze-select.correct { border-color: var(--c-success); background: var(--c-success-bg); color: var(--c-success); }
+.cloze-select.incorrect { border-color: var(--c-error); background: var(--c-error-bg); color: var(--c-error); }
+
+/* Status messages */
+.status {
+  padding: 14px 18px;
+  border-radius: 2px;
+  font-size: 14px;
+  line-height: 1.5;
+  margin: 20px 0;
+  display: none;
+  border-left: 3px solid;
+}
+
+.status.show { display: block; animation: slideIn 0.3s ease both; }
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(-8px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+.status-info {
+  background: rgba(79, 142, 219, 0.08);
+  border-color: var(--c-blue);
+  color: var(--c-text);
+}
+
+.status-warning {
+  background: var(--c-error-bg);
+  border-color: var(--c-error);
+  color: var(--c-text);
+}
+
+.status-success {
+  background: var(--c-success-bg);
+  border-color: var(--c-success);
+  color: var(--c-text);
+}
+
+.status .label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  display: block;
+  margin-bottom: 4px;
+  opacity: 0.7;
+}
+
+/* Hint button */
+.hint-btn {
+  background: transparent;
+  border: 1px solid var(--c-border-soft);
+  color: var(--c-text-mute);
+  padding: 8px 14px;
+  font-size: 12px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+
+.hint-btn:hover {
+  border-color: var(--c-gold);
+  color: var(--c-gold);
+}
+
+/* ============================================================
+   LIBRARY ROOMS
+   ============================================================ */
+
+.library-banner {
+  background: linear-gradient(135deg, rgba(47, 184, 160, 0.12) 0%, rgba(47, 184, 160, 0.04) 100%);
+  border: 1px solid rgba(47, 184, 160, 0.35);
+  border-left: 3px solid var(--c-teal);
+  border-radius: 3px;
+  padding: 18px 22px;
+  margin-bottom: 28px;
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+
+.library-banner-icon {
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+  color: var(--c-teal);
+}
+
+.library-banner-text {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--c-text);
+}
+
+.library-banner-text strong {
+  color: var(--c-teal);
+}
+
+.library-banner-text .warn {
+  display: block;
+  margin-top: 6px;
+  color: var(--c-gold);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+  letter-spacing: 0.02em;
+}
+
+.lib-section {
+  margin-bottom: 28px;
+}
+
+.lib-section-title {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--c-text);
+  margin-bottom: 10px;
+  letter-spacing: -0.015em;
+}
+
+.lib-section-lede {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.55;
+  color: var(--c-text-mute);
+  margin-bottom: 14px;
+}
+
+.lib-section p {
+  font-size: 14.5px;
+  line-height: 1.65;
+  color: var(--c-text);
+  margin-bottom: 12px;
+}
+
+.lib-section p strong { color: var(--c-gold); font-weight: 600; }
+
+.lib-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+  margin: 16px 0;
+}
+
+.lib-card {
+  background: rgba(15, 31, 58, 0.5);
+  border: 1px solid var(--c-border-soft);
+  border-left: 3px solid var(--c-gold);
+  border-radius: 2px;
+  padding: 16px 18px;
+}
+
+.lib-card.teal { border-left-color: var(--c-teal); }
+.lib-card.muted { border-left-color: var(--c-text-dim); opacity: 0.85; }
+
+.lib-card-title {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--c-gold);
+  margin-bottom: 6px;
+}
+
+.lib-card.teal .lib-card-title { color: var(--c-teal); }
+
+.lib-card-sub {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+  margin-bottom: 6px;
+}
+
+.lib-card-body {
+  font-size: 13px;
+  line-height: 1.55;
+  color: var(--c-text);
+}
+
+.lib-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 12px 0;
+  font-size: 13.5px;
+}
+
+.lib-table th,
+.lib-table td {
+  padding: 9px 12px;
+  text-align: left;
+  border-bottom: 1px solid var(--c-border-soft);
+}
+
+.lib-table th {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--c-gold);
+  border-bottom: 1.5px solid var(--c-border);
+}
+
+.lib-table td:first-child {
+  font-family: var(--font-display);
+  font-weight: 600;
+  color: var(--c-text);
+  width: 28%;
+}
+
+.lib-svg-frame {
+  background: rgba(6, 12, 26, 0.4);
+  border: 1px solid var(--c-border-soft);
+  border-radius: 3px;
+  padding: 18px;
+  margin: 16px 0;
+  text-align: center;
+}
+
+.lib-svg-frame svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.lib-bullets {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0;
+}
+
+.lib-bullets li {
+  padding: 5px 0 5px 24px;
+  position: relative;
+  font-size: 14px;
+  line-height: 1.55;
+  color: var(--c-text);
+}
+
+.lib-bullets li::before {
+  content: '';
+  position: absolute;
+  left: 6px;
+  top: 13px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--c-gold);
+}
+
+.lib-bullets li strong { color: var(--c-gold); }
+
+.lib-warning-bar {
+  margin-top: 32px;
+  padding: 18px 22px;
+  background: linear-gradient(90deg, rgba(212, 175, 55, 0.12) 0%, rgba(212, 175, 55, 0.04) 100%);
+  border-left: 3px solid var(--c-gold);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.lib-warning-bar .icon {
+  width: 28px;
+  height: 28px;
+  flex-shrink: 0;
+  color: var(--c-gold);
+}
+
+.lib-warning-bar .text {
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--c-text);
+  flex: 1;
+}
+
+.lib-warning-bar .text strong { color: var(--c-gold); }
+
+.seal.library {
+  width: 14px;
+  height: 14px;
+  border-radius: 2px;
+  border: 1px solid var(--c-border-soft);
+  background: transparent;
+}
+
+.seal.library.active {
+  border-color: var(--c-teal);
+  background: var(--c-teal);
+  box-shadow: 0 0 8px rgba(47, 184, 160, 0.5);
+}
+
+.seal.library.visited {
+  background: var(--c-teal);
+  border-color: var(--c-teal);
+  opacity: 0.5;
+}
+
+/* ============================================================
+   LETTER REVEAL ANIMATION
+   ============================================================ */
+
+.reveal-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  background: radial-gradient(circle at center, rgba(6, 12, 26, 0.97) 0%, rgba(6, 12, 26, 1) 70%);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.reveal-overlay.show {
+  display: flex;
+  opacity: 1;
+}
+
+.reveal-inner {
+  text-align: center;
+  position: relative;
+  padding: 0 24px;
+}
+
+.reveal-letter {
+  font-family: var(--font-display);
+  font-size: clamp(180px, 32vw, 360px);
+  font-weight: 800;
+  color: var(--c-gold-bright);
+  line-height: 1;
+  text-shadow:
+    0 0 60px rgba(255, 215, 0, 0.5),
+    0 0 120px rgba(212, 175, 55, 0.3);
+  animation: letterReveal 1.4s cubic-bezier(0.16, 1, 0.3, 1) both;
+  font-style: italic;
+  display: block;
+}
+
+@keyframes letterReveal {
+  0% { transform: scale(0.4) rotate(-10deg); opacity: 0; filter: blur(20px); }
+  60% { transform: scale(1.05) rotate(2deg); opacity: 1; filter: blur(0); }
+  100% { transform: scale(1) rotate(0); opacity: 1; filter: blur(0); }
+}
+
+.reveal-caption {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--c-gold);
+  margin-top: 24px;
+  animation: captionIn 0.6s ease 0.8s both;
+}
+
+@keyframes captionIn {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.reveal-progress {
+  position: absolute;
+  bottom: -120px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 14px;
+  animation: captionIn 0.6s ease 1.2s both;
+}
+
+.reveal-progress-letter {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--c-text-dim);
+  width: 36px;
+  text-align: center;
+  letter-spacing: -0.02em;
+}
+
+.reveal-progress-letter.lit {
+  color: var(--c-gold);
+  text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+}
+
+.reveal-next {
+  margin-top: 60px;
+  animation: captionIn 0.6s ease 1.5s both;
+}
+
+/* ============================================================
+   FINAL SCREEN
+   ============================================================ */
+
+.final-hero {
+  text-align: center;
+  padding: 80px 0 40px;
+}
+
+.final-code {
+  font-family: var(--font-display);
+  font-size: clamp(72px, 14vw, 160px);
+  font-weight: 800;
+  font-style: italic;
+  letter-spacing: 0.06em;
+  background: linear-gradient(180deg, var(--c-gold-bright) 0%, var(--c-gold) 60%, #8a7220 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+  line-height: 1;
+  filter: drop-shadow(0 0 60px rgba(212, 175, 55, 0.4));
+}
+
+.final-suffix {
+  font-family: var(--font-mono);
+  font-size: clamp(20px, 3vw, 28px);
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  color: var(--c-text-mute);
+  margin-bottom: 40px;
+}
+
+.final-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin: 40px 0;
+}
+
+.final-action {
+  display: block;
+  padding: 24px 24px;
+  background: linear-gradient(165deg, var(--c-bg-card) 0%, var(--c-bg-card-hi) 100%);
+  border: 1px solid var(--c-border);
+  border-radius: 4px;
+  text-decoration: none;
+  color: var(--c-text);
+  transition: all 0.25s ease;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  font-size: inherit;
+  width: 100%;
+}
+
+.final-action:hover {
+  border-color: var(--c-gold);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-glow);
+}
+
+.final-action .icon-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.final-action .icon {
+  width: 32px;
+  height: 32px;
+  fill: var(--c-gold);
+}
+
+.final-action .label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+}
+
+.final-action .title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.final-action .desc {
+  font-size: 13px;
+  color: var(--c-text-mute);
+  line-height: 1.5;
+}
+
+/* ============================================================
+   ROOM-SPECIFIC THEMING
+   ============================================================ */
+
+.room-header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  margin-bottom: 32px;
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--c-border-soft);
+}
+
+.room-number {
+  font-family: var(--font-display);
+  font-size: 64px;
+  font-weight: 800;
+  font-style: italic;
+  color: var(--c-gold);
+  line-height: 1;
+  letter-spacing: -0.03em;
+}
+
+.room-meta { flex: 1; }
+
+.room-location {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--c-text-dim);
+  margin-bottom: 4px;
+}
+
+.room-name {
+  font-family: var(--font-display);
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+}
+
+/* Intro screen specific */
+.intro-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 32px;
+  align-items: start;
+  margin-top: 32px;
+}
+
+@media (min-width: 900px) {
+  .intro-grid { grid-template-columns: 1.4fr 1fr; gap: 48px; }
+}
+
+.intro-meta {
+  background: rgba(15, 31, 58, 0.4);
+  border: 1px solid var(--c-border-soft);
+  border-radius: 4px;
+  padding: 24px;
+}
+
+.intro-meta dt {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--c-gold);
+  margin-bottom: 4px;
+  margin-top: 18px;
+}
+
+.intro-meta dt:first-child { margin-top: 0; }
+
+.intro-meta dd {
+  font-family: var(--font-body);
+  font-size: 14px;
+  color: var(--c-text);
+  line-height: 1.5;
+}
+
+/* Hint box */
+.hint-box {
+  margin-top: 16px;
+  padding: 14px 18px;
+  background: rgba(79, 142, 219, 0.08);
+  border-left: 3px solid var(--c-blue);
+  border-radius: 2px;
+  font-size: 13.5px;
+  line-height: 1.55;
+  color: var(--c-text-mute);
+  display: none;
+}
+
+.hint-box.show { display: block; animation: slideIn 0.3s ease both; }
+
+.hint-box .label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--c-blue);
+  display: block;
+  margin-bottom: 6px;
+}
+
+/* utility */
+.spacer-sm { height: 16px; }
+.spacer-md { height: 32px; }
+.text-mute { color: var(--c-text-mute); }
+.center { text-align: center; }
+.font-mono { font-family: var(--font-mono); }
+.muted-list { color: var(--c-text-mute); padding-left: 1.2em; }
+.muted-list li { margin: 4px 0; font-size: 14px; }
+
+</style>
+</head>
+<body>
+<div class="app">
+
+<!-- ============================================================
+     TOP BAR
+     ============================================================ -->
+<header class="topbar">
+  <div class="topbar-brand">
+    <svg class="stars-icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <g><circle cx="12" cy="3.2" r="0.9"/><circle cx="17.5" cy="5.5" r="0.9"/><circle cx="20.5" cy="10.5" r="0.9"/><circle cx="20.5" cy="16.5" r="0.9"/><circle cx="17.5" cy="21" r="0.9"/><circle cx="12" cy="23.2" r="0.9"/><circle cx="6.5" cy="21" r="0.9"/><circle cx="3.5" cy="16.5" r="0.9"/><circle cx="3.5" cy="10.5" r="0.9"/><circle cx="6.5" cy="5.5" r="0.9"/></g>
+    </svg>
+    <span>EU-Klimagipfel</span>
+  </div>
+  <div class="topbar-progress" id="progressSeals">
+    <!-- seals injected by JS -->
+  </div>
+</header>
+
+<!-- ============================================================
+     MAIN CONTENT
+     ============================================================ -->
+<main class="main">
+  <div id="screenContainer" class="screen"></div>
+</main>
+
+<footer class="site-footer">Copyright Jan-Rickmer Feindt</footer>
+
+</div>
+
+<!-- ============================================================
+     LETTER REVEAL OVERLAY
+     ============================================================ -->
+<div class="reveal-overlay" id="revealOverlay">
+  <div class="reveal-inner">
+    <span class="reveal-letter" id="revealLetter">E</span>
+    <div class="reveal-caption" id="revealCaption">Buchstabe 1 von 6 freigeschaltet</div>
+    <div class="reveal-progress" id="revealProgress"></div>
+    <div class="reveal-next">
+      <button class="btn btn-primary btn-arrow" id="revealContinue">Weiter</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==== Eingebetteter Feiditor (Digitales Arbeitsblatt) ==== -->
+<script type="text/template" id="feiditor-src">
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Feiditor</title>
+<style>
+  :root{
+    --paper:#f7f4ec; --paper2:#fffdf8; --ink:#221f1a; --muted:#6f675a;
+    --line:#ddd5c4; --accent:#6b4f2c; --accent2:#8a6a3c; --shadow:rgba(40,30,15,.10);
+    --serif:"Iowan Old Style","Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
+    --sans:"Avenir Next",Avenir,"Segoe UI","Helvetica Neue",system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0; background:var(--paper); color:var(--ink); font-family:var(--sans);
+    -webkit-font-smoothing:antialiased; line-height:1.5;
+  }
+  .screen{display:none; min-height:100vh}
+  .screen.active{display:block}
+
+  /* ---------- Start ---------- */
+  #screen-start{display:none; place-items:center; padding:40px 20px}
+  #screen-start.active{display:grid}
+  .card{
+    width:100%; max-width:440px; background:var(--paper2);
+    border:1px solid var(--line); border-radius:14px; padding:40px 36px;
+    box-shadow:0 18px 50px -28px var(--shadow);
+  }
+  .brand{font-family:var(--serif); font-size:13px; letter-spacing:.22em; text-transform:uppercase; color:var(--accent); margin:0 0 6px}
+  .card h1{font-family:var(--serif); font-weight:600; font-size:30px; margin:0 0 4px; letter-spacing:.01em}
+  .card p.sub{color:var(--muted); margin:0 0 26px; font-size:14.5px}
+  label{display:block; font-size:12.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin:0 0 6px}
+  .field{margin-bottom:18px}
+  input[type=text]{
+    width:100%; font-family:var(--serif); font-size:18px; color:var(--ink);
+    background:var(--paper); border:1px solid var(--line); border-radius:9px;
+    padding:11px 13px; outline:none; transition:border-color .15s, box-shadow .15s;
+  }
+  input[type=text]:focus{border-color:var(--accent2); box-shadow:0 0 0 3px rgba(138,106,60,.16)}
+  .btn{
+    font-family:var(--sans); font-size:15px; font-weight:600; letter-spacing:.01em;
+    color:var(--paper2); background:var(--ink); border:1px solid var(--ink);
+    border-radius:9px; padding:12px 18px; cursor:pointer; transition:transform .06s, background .15s;
+  }
+  .btn:hover{background:#332e25}
+  .btn:active{transform:translateY(1px)}
+  .btn.block{width:100%; margin-top:6px}
+  .btn.ghost{background:transparent; color:var(--ink); border-color:var(--line)}
+  .btn.ghost:hover{background:var(--paper)}
+  .err{color:#b3261e; font-size:13.5px; min-height:18px; margin:2px 0 0}
+  .foot{margin-top:24px; padding-top:16px; border-top:1px solid var(--line); text-align:center}
+  .foot a{color:var(--muted); font-size:12.5px; text-decoration:none; letter-spacing:.04em}
+  .foot a:hover{color:var(--accent); text-decoration:underline}
+
+  /* ---------- Editor ---------- */
+  #screen-editor{display:none; flex-direction:column; height:100vh}
+  #screen-editor.active{display:flex}
+  .topbar{
+    display:flex; align-items:center; justify-content:space-between; gap:16px;
+    padding:13px 22px; border-bottom:1px solid var(--line); background:var(--paper2);
+  }
+  .who{font-family:var(--serif); font-size:16px}
+  .who .lbl{font-family:var(--sans); font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); margin-right:8px}
+  .count{font-size:12.5px; color:var(--muted); font-variant-numeric:tabular-nums}
+  .paperwrap{flex:1; overflow:auto; display:flex; flex-direction:column; align-items:center; padding:34px 20px 150px}
+  .sheet{
+    width:100%; max-width:760px; background:var(--paper2); border:1px solid var(--line);
+    border-radius:6px; box-shadow:0 24px 60px -40px var(--shadow); padding:56px 60px;
+  }
+  #editor{
+    width:100%; min-height:60vh; resize:none; border:0; outline:0;
+    font-family:var(--serif); font-size:18px; line-height:32px; color:var(--ink);
+    background-color:transparent;
+    background-image:repeating-linear-gradient(to bottom,
+      transparent 0,
+      transparent 31px,
+      var(--line) 31px,
+      var(--line) 32px);
+    background-attachment:local;
+    padding:0;
+  }
+  #editor::placeholder{color:#b9b0a0}
+  .moodle-hint{
+    max-width:760px; margin:14px auto 0; padding:14px 20px;
+    background:#fdecea; border:1.5px solid #f5b8b1; border-radius:8px;
+    color:#a72020; font-family:var(--sans); font-size:14.5px; font-weight:600;
+    text-align:center; line-height:1.5;
+  }
+  .actionbar{
+    position:fixed; left:0; right:0; bottom:0; display:flex; justify-content:center;
+    padding:16px 16px 46px; background:linear-gradient(to top, var(--paper) 60%, rgba(247,244,236,0));
+  }
+  .copyright{
+    position:fixed; left:0; right:0; bottom:13px; text-align:center;
+    font-size:11px; letter-spacing:.05em; color:var(--muted); pointer-events:none; z-index:6;
+  }
+
+  /* ---------- Lehrkraft ---------- */
+  #screen-teacher{display:none; place-items:start center; padding:40px 20px 80px}
+  #screen-teacher.active{display:grid}
+  .panel{width:100%; max-width:920px}
+  .panel h1{font-family:var(--serif); font-weight:600; font-size:26px; margin:0 0 4px}
+  .panel .sub{color:var(--muted); margin:0 0 22px; font-size:14.5px}
+  .drop{
+    background:var(--paper2); border:1.5px dashed var(--line); border-radius:12px;
+    padding:26px; text-align:center; color:var(--muted); font-size:14.5px;
+  }
+  .drop strong{color:var(--ink)}
+  .row{display:flex; gap:12px; flex-wrap:wrap; align-items:center; margin-top:14px}
+  input[type=password]{
+    font-family:var(--serif); font-size:18px; letter-spacing:.12em; width:180px;
+    background:var(--paper); border:1px solid var(--line); border-radius:9px; padding:10px 12px; outline:none;
+  }
+  input[type=password]:focus{border-color:var(--accent2); box-shadow:0 0 0 3px rgba(138,106,60,.16)}
+  .hidden{display:none !important}
+  .backlink{display:inline-block; margin-bottom:18px; color:var(--muted); font-size:13px; text-decoration:none}
+  .backlink:hover{color:var(--accent)}
+
+  /* analysis */
+  .legend{display:flex; gap:18px; flex-wrap:wrap; margin:20px 0 14px; font-size:13.5px; color:var(--muted)}
+  .legend span{display:inline-flex; align-items:center; gap:7px}
+  .sw{width:13px; height:13px; border-radius:3px; display:inline-block}
+  .stat{font-size:13px; color:var(--muted); margin:0 0 16px; font-variant-numeric:tabular-nums}
+  .analysis{
+    background:var(--paper2); border:1px solid var(--line); border-radius:10px;
+    padding:30px 34px; font-family:var(--serif); font-size:17.5px; line-height:1.85;
+    white-space:pre-wrap; word-wrap:break-word; overflow-wrap:anywhere;
+  }
+  .nmeta{font-family:var(--sans); font-size:12.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--muted); margin-bottom:14px}
+</style>
+</head>
+<body>
+
+<!-- ============ START ============ -->
+<section id="screen-start" class="screen active">
+  <div class="card">
+    <p class="brand">Feiditor</p>
+    <h1>Bevor du beginnst</h1>
+    <p class="sub">Bitte trage deinen Namen ein. Danach öffnet sich der Schreibbereich.</p>
+    <div class="field">
+      <label for="vorname">Vorname</label>
+      <input type="text" id="vorname" autocomplete="off" spellcheck="false">
+    </div>
+    <div class="field">
+      <label for="nachname">Nachname</label>
+      <input type="text" id="nachname" autocomplete="off" spellcheck="false">
+    </div>
+    <p class="err" id="start-err"></p>
+    <button class="btn block" id="start-btn">Schreibbereich öffnen</button>
+    <div class="foot"><a href="#" id="to-teacher">Lehrkraft</a></div>
+  </div>
+</section>
+
+<!-- ============ EDITOR ============ -->
+<section id="screen-editor" class="screen">
+  <div class="topbar">
+    <div class="who"><span class="lbl">Verfasser:in</span><span id="who-name"></span></div>
+    <div class="count"><span id="charcount">0</span> Zeichen</div>
+  </div>
+  <div class="paperwrap">
+    <div class="sheet">
+      <textarea id="editor" placeholder="Hier schreiben…" spellcheck="true" autocomplete="off"></textarea>
+    </div>
+    <div class="moodle-hint">Aufgabe 7: Bearbeite nun auf Moodle die Aufgabe „Text verfassen …".</div>
+    <div class="moodle-hint">Lade nach Abschluss der Aufgaben die hier herunterzuladende PDF-Datei bei Moodle hoch.</div>
+  </div>
+  <div class="actionbar">
+    <button class="btn" id="export-btn">Text in PDF-Datei umwandeln</button>
+  </div>
+</section>
+
+<!-- ============ LEHRKRAFT ============ -->
+<section id="screen-teacher" class="screen">
+  <div class="panel">
+    <a href="#" class="backlink" id="back-start">← zurück</a>
+    <h1>Auswertung für die Lehrkraft</h1>
+    <p class="sub">Laden Sie die vom Schüler abgegebene PDF-Datei und geben Sie den Code ein.
+       Der Code ist die Anzahl der Buchstaben im Vornamen des Schülers multipliziert mit 1104
+       (Beispiel: Vorname „Lina" = 4 Buchstaben → Code 4416). Danach wird der Text farblich
+       ausgewertet, und die Escape-Room-Daten (Name, Geburtsdatum, Bestätigungscode) werden angezeigt.</p>
+
+    <div class="drop">
+      <p style="margin:0 0 10px"><strong>PDF auswählen</strong> oder hierher ziehen</p>
+      <input type="file" id="pdf-input" accept="application/pdf,.pdf">
+    </div>
+    <p class="err" id="teacher-err"></p>
+
+    <div id="code-area" class="hidden">
+      <div class="row">
+        <input type="password" id="code-input" inputmode="numeric" placeholder="Code">
+        <button class="btn" id="code-btn">Auswertung anzeigen</button>
+      </div>
+    </div>
+
+    <div id="result"></div>
+  </div>
+</section>
+
+<div id="pagefoot" class="copyright">Copyright Jan-Rickmer Feindt</div>
+
+<script>
+/* ====================================================================== *
+ *  Selbst gebauter, vollständig offline laufender Editor mit Tracking.   *
+ *  Keine externen Bibliotheken, keine Netzwerkaufrufe.                   *
+ * ====================================================================== */
+
+/* ---------- Helvetica-Glyphbreiten (AFM, Einheiten/1000), nach Byte ---------- */
+const HELV={32:278,33:278,34:355,35:556,36:556,37:889,38:667,39:191,40:333,41:333,42:389,43:584,44:278,45:333,46:278,47:278,48:556,49:556,50:556,51:556,52:556,53:556,54:556,55:556,56:556,57:556,58:278,59:278,60:584,61:584,62:584,63:556,64:1015,65:667,66:667,67:722,68:722,69:667,70:611,71:778,72:722,73:278,74:500,75:667,76:556,77:833,78:722,79:778,80:667,81:778,82:722,83:667,84:611,85:722,86:667,87:944,88:667,89:667,90:611,91:278,92:278,93:278,94:469,95:556,96:333,97:556,98:556,99:500,100:556,101:556,102:278,103:556,104:556,105:222,106:222,107:500,108:222,109:833,110:556,111:556,112:556,113:556,114:333,115:500,116:278,117:556,118:500,119:722,120:500,121:500,122:500,123:334,124:260,125:334,126:584,133:1000,145:222,146:222,147:333,148:333,149:350,150:556,151:1000,160:278,161:333,162:556,163:556,164:556,165:556,166:260,167:556,168:333,169:737,170:370,171:556,172:584,173:333,174:737,175:333,176:400,177:584,178:333,179:333,180:333,181:556,182:537,183:278,184:333,185:333,186:365,187:556,188:834,189:834,190:834,191:611,192:667,193:667,194:667,195:667,196:667,197:667,198:1000,199:722,200:667,201:667,202:667,203:667,204:278,205:278,206:278,207:278,208:722,209:722,210:778,211:778,212:778,213:778,214:778,215:584,216:778,217:722,218:722,219:722,220:722,221:667,222:667,223:611,224:556,225:556,226:556,227:556,228:556,229:556,230:889,231:500,232:556,233:556,234:556,235:556,236:278,237:278,238:278,239:278,240:556,241:556,242:556,243:556,244:556,245:556,246:556,247:584,248:611,249:556,250:556,251:556,252:556,253:500,254:556,255:500};
+function afm(b){return HELV[b]!==undefined?HELV[b]:556;}
+const CP1252={0x20AC:128,0x201A:130,0x0192:131,0x201E:132,0x2026:133,0x2020:134,0x2021:135,0x02C6:136,0x2030:137,0x0160:138,0x2039:139,0x0152:140,0x017D:142,0x2018:145,0x2019:146,0x201C:147,0x201D:148,0x2022:149,0x2013:150,0x2014:151,0x02DC:152,0x2122:153,0x0161:154,0x203A:155,0x0153:156,0x017E:158,0x0178:159};
+function charByte(ch){const cp=ch.codePointAt(0);if(cp<=0xFF)return cp;if(CP1252[cp]!==undefined)return CP1252[cp];return 0x3F;}
+function charWidth(ch,s){return afm(charByte(ch))/1000*s;}
+function textWidth(str,s){let w=0;for(const ch of str)w+=charWidth(ch,s);return w;}
+function encStr(str){let o="";for(const ch of str){const b=charByte(ch);if(b===0x28)o+="\\(";else if(b===0x29)o+="\\)";else if(b===0x5C)o+="\\\\";else o+=String.fromCharCode(b);}return o;}
+
+function wrapText(text,maxW,size){
+  const lines=[]; const paras=text.replace(/\r\n?/g,"\n").split("\n");
+  for(const para of paras){
+    if(para===""){lines.push("");continue;}
+    const words=para.split(/( )/); let cur="";
+    const pushWord=(w)=>{
+      if(textWidth(w,size)>maxW){
+        let chunk="";
+        for(const ch of w){
+          if(textWidth(chunk+ch,size)>maxW&&chunk!==""){
+            if(cur!==""){lines.push(cur);cur="";} lines.push(chunk); chunk=ch;
+          } else chunk+=ch;
+        }
+        if(chunk){if(cur!==""){lines.push(cur);cur="";} cur=chunk;} return;
+      }
+      if(textWidth(cur+w,size)>maxW&&cur!==""){lines.push(cur.replace(/ +$/,""));cur=w.trim()===""?"":w;}
+      else cur+=w;
+    };
+    for(const w of words) pushWord(w);
+    lines.push(cur.replace(/ +$/,""));
+  }
+  return lines;
+}
+
+function buildPdf(opts){
+  const PW=595.28,PH=841.89, ML=56,MR=56,MT=56,MB=64;
+  const HEAD_SIZE=13,BODY_SIZE=11,NOTE_SIZE=11,LEAD=15.5;
+  const usableW=PW-ML-MR;
+  const headerBaseline=PH-MT-HEAD_SIZE, ruleY=headerBaseline-6, bodyTop=ruleY-22, bodyBottom=MB+24;
+  const allLines=wrapText(opts.body||"",usableW,BODY_SIZE);
+  if(allLines.length===0) allLines.push("");
+  const pages=[]; let idx=0;
+  while(idx<allLines.length){
+    const pageLines=[]; let y=bodyTop;
+    while(idx<allLines.length&&y>=bodyBottom){pageLines.push({text:allLines[idx],y});y-=LEAD;idx++;}
+    pages.push({lines:pageLines});
+  }
+  const nPages=pages.length;
+
+  // roter Moodle-Hinweis unten auf der letzten Seite
+  const noteText="Bitte diese PDF-Datei herunterladen und bei Moodle hochladen.";
+  const noteLines=wrapText(noteText,usableW,NOTE_SIZE);
+  const noteBottom=46; // Grundlinie der untersten Hinweiszeile
+
+  const pageObjNum=(i)=>4+i*2, contObjNum=(i)=>5+i*2;
+  const objects={};
+  objects[1]="<< /Type /Catalog /Pages 2 0 R >>";
+  objects[2]=`<< /Type /Pages /Count ${nPages} /Kids [${pages.map((_,i)=>`${pageObjNum(i)} 0 R`).join(" ")}] >>`;
+  objects[3]="<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>";
+  for(let i=0;i<nPages;i++){
+    objects[pageObjNum(i)]=`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PW.toFixed(2)} ${PH.toFixed(2)}] /Resources << /Font << /F1 3 0 R >> >> /Contents ${contObjNum(i)} 0 R >>`;
+    let s="0.5 w\n";
+    s+=`BT /F1 ${HEAD_SIZE} Tf 0 0 0 rg ${ML} ${headerBaseline.toFixed(2)} Td (${encStr(opts.name||"")}) Tj ET\n`;
+    s+=`${ML} ${ruleY.toFixed(2)} m ${(PW-MR).toFixed(2)} ${ruleY.toFixed(2)} l S\n`;
+    const pl=pages[i].lines;
+    if(pl.length){
+      s+=`BT /F1 ${BODY_SIZE} Tf 0 0 0 rg ${ML} ${pl[0].y.toFixed(2)} Td ${LEAD} TL\n`;
+      for(let j=0;j<pl.length;j++){if(j>0)s+="T*\n"; s+=`(${encStr(pl[j].text)}) Tj\n`;}
+      s+="ET\n";
+    }
+    if(i===nPages-1){ // roter Hinweis nur auf der letzten Seite
+      const topY=noteBottom+(noteLines.length-1)*LEAD;
+      s+=`BT /F1 ${NOTE_SIZE} Tf 0.78 0.05 0.05 rg ${ML} ${topY.toFixed(2)} Td ${LEAD} TL\n`;
+      for(let j=0;j<noteLines.length;j++){if(j>0)s+="T*\n"; s+=`(${encStr(noteLines[j])}) Tj\n`;}
+      s+="ET\n";
+    }
+    objects[contObjNum(i)]={stream:s};
+  }
+  let pdf="%PDF-1.7\n%\u00E2\u00E3\u00CF\u00D3\n";
+  if(opts.trackB64) pdf+=`%TRACKDATA ${opts.trackB64}\n`;
+  const offsets={}; const maxNum=3+nPages*2;
+  for(let n=1;n<=maxNum;n++){
+    offsets[n]=pdf.length; const o=objects[n];
+    if(o&&o.stream!==undefined){const st=o.stream;pdf+=`${n} 0 obj\n<< /Length ${st.length} >>\nstream\n${st}endstream\nendobj\n`;}
+    else pdf+=`${n} 0 obj\n${o}\nendobj\n`;
+  }
+  const xrefStart=pdf.length;
+  pdf+=`xref\n0 ${maxNum+1}\n0000000000 65535 f \n`;
+  for(let n=1;n<=maxNum;n++) pdf+=String(offsets[n]).padStart(10,"0")+" 00000 n \n";
+  pdf+=`trailer\n<< /Size ${maxNum+1} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`;
+  return pdf;
+}
+
+/* ---------------- gemeinsame Krypto- & Auswertungs-Funktionen ---------------- *
+ * Diese werden per toString() in die Lehrkraft-Seite (data:-Link) eingebettet,  *
+ * damit es nur EINE Quelle der Wahrheit gibt.                                   */
+function bytesToB64(bytes){let bin="";const CH=0x8000;for(let i=0;i<bytes.length;i+=CH)bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+CH));return btoa(bin);}
+function b64ToBytes(b64){const bin=atob(b64);const out=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);return out;}
+async function _key(codeStr,usage){const mat=await crypto.subtle.digest("SHA-256",new TextEncoder().encode(codeStr));return crypto.subtle.importKey("raw",mat,{name:"AES-GCM"},false,usage);}
+async function aesEncrypt(plain,codeStr){const iv=crypto.getRandomValues(new Uint8Array(12));const key=await _key(codeStr,["encrypt"]);const ct=await crypto.subtle.encrypt({name:"AES-GCM",iv},key,new TextEncoder().encode(plain));return bytesToB64(iv)+":"+bytesToB64(new Uint8Array(ct));}
+async function aesDecrypt(bundle,codeStr){const parts=bundle.split(":");const iv=b64ToBytes(parts[0]);const ct=b64ToBytes(parts[1]);const key=await _key(codeStr,["decrypt"]);const pt=await crypto.subtle.decrypt({name:"AES-GCM",iv},key,ct);return new TextDecoder().decode(pt);}
+function esc(s){return s.replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;"}[c]));}
+function classify(isVisible,src,gap){
+  const COL={plain:"#23201b",paste:"#b3261e",fast:"#c2710c",slow:"#1f7a34",system:"#9c948a"};
+  if(!isVisible) return COL.plain;
+  if(src==="s") return COL.system;           // System-Text (vorbefüllte Aufgaben) -> gedämpftes Grau
+  if(src==="p") return COL.paste;            // aus Zwischenablage -> rot
+  if(gap>=0&&gap<=15) return COL.paste;      // <= 0,015 s getippt -> rot
+  if(gap>15&&gap<=70) return COL.fast;       // 0,015-0,07 s -> orange
+  return COL.slow;                           // > 0,07 s / erstes Zeichen -> grün
+}
+function renderAnalysis(payload){
+  const t=payload.t, m=payload.m||[];
+  let html=""; let total=0,red=0,orange=0,green=0,sysCount=0;
+  const WS=/\s/;
+  for(let i=0;i<t.length;i++){
+    const ch=t[i]; const isV=!WS.test(ch);
+    const mark=m[i]||["t",-1]; const src=mark[0]; const gap=mark[1];
+    const col=classify(isV,src,gap);
+    if(isV){
+      if(src==="s"){ sysCount++; }
+      else{
+        total++;
+        if(col==="#b3261e") red++;
+        else if(col==="#c2710c") orange++;
+        else green++;
+      }
+    }
+    html+=`<span style="color:${col}">${esc(ch)}</span>`;
+  }
+  const pct=(x)=>total?Math.round(x/total*100):0;
+  const legend=
+    '<div class="legend">'+
+      '<span><i class="sw" style="background:#9c948a"></i>vorbefüllte Aufgabenstellung (kein Schülertext)</span>'+
+      '<span><i class="sw" style="background:#b3261e"></i>eingefügt oder ≤ 0,015 s getippt</span>'+
+      '<span><i class="sw" style="background:#c2710c"></i>0,015–0,07 s nach vorherigem Zeichen getippt</span>'+
+      '<span><i class="sw" style="background:#1f7a34"></i>&gt; 0,07 s nach vorherigem Zeichen getippt</span>'+
+    '</div>';
+  const stat=`<p class="stat">Schülertext (ohne vorbefüllte Aufgaben): ${total} Zeichen · rot: ${red} (${pct(red)} %) · orange: ${orange} (${pct(orange)} %) · grün: ${green} (${pct(green)} %) · vorbefüllt: ${sysCount} Zeichen</p>`;
+  let escapeBlock="";
+  if(payload.e){
+    escapeBlock=
+      '<div style="background:#fffdf8;border:1px solid #ddd5c4;border-radius:10px;padding:18px 22px;margin:0 0 18px;font-family:Iowan Old Style,Palatino,Georgia,serif;font-size:15.5px;line-height:1.55">'+
+        '<div style="font-family:Avenir Next,system-ui,sans-serif;font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:#6f675a;margin-bottom:10px">Escape-Room-Daten</div>'+
+        '<div><strong>Name:</strong> '+esc(payload.e.fn||"")+' '+esc(payload.e.ln||"")+'</div>'+
+        '<div><strong>Geburtsdatum:</strong> '+esc(payload.e.bd||"")+'</div>'+
+        '<div><strong>Bestätigungscode:</strong> '+esc(payload.e.cd||"")+'</div>'+
+      '</div>';
+  }
+  const head=`<div class="nmeta">Verfasser:in — ${esc(payload.n||"")}</div>`;
+  return head+escapeBlock+legend+stat+`<div class="analysis">${html}</div>`;
+}
+
+/* ---------------- gemeinsame Krypto-Funktionen werden nur noch lokal genutzt ---------------- */
+
+/* ----------------------- geheime Code-Bildung (Lehrkraft) ----------------------- */
+function _kf(s){const n=(s.match(/\p{L}/gu)||[]).length;return String(n*(0x230+0x220));}
+
+/* ------------------------------ Tracking ------------------------------ */
+let prevValue="";
+let recs=[];          // pro Zeichen: {src:'t'|'p', t:ms}
+let justPasted=false; // wird durch paste/drop gesetzt, nach einem input-Event geleert
+
+function reconcile(newVal,pasted,now){
+  const a=prevValue,b=newVal; const minL=Math.min(a.length,b.length);
+  let p=0; while(p<minL&&a[p]===b[p])p++;
+  let s=0; while(s<minL-p&&a[a.length-1-s]===b[b.length-1-s])s++;
+  const removed=a.length-p-s;
+  const inserted=b.slice(p,b.length-s);
+  const ins=inserted.split("").map(()=>({src:pasted?"p":"t",t:now}));
+  recs.splice(p,removed,...ins);
+  if(recs.length!==b.length){ // Sicherheitsnetz gegen Desync
+    recs=b.split("").map(()=>({src:"t",t:now}));
+  }
+  prevValue=newVal;
+}
+
+function buildPayload(name,text){
+  if(recs.length!==text.length){ // letzte Absicherung
+    const now=Date.now(); recs=text.split("").map(()=>({src:"t",t:now}));
+  }
+  const m=[];
+  for(let i=0;i<text.length;i++){
+    const gap=(i===0)?-1:(recs[i].t-recs[i-1].t);
+    m.push([recs[i].src,gap]);
+  }
+  return {n:name,t:text,m};
+}
+
+/* ------------------------------ UI-Steuerung ------------------------------ */
+const $=(id)=>document.getElementById(id);
+function show(screen){
+  document.querySelectorAll(".screen").forEach(s=>s.classList.remove("active"));
+  $(screen).classList.add("active");
+  const pf=$("pagefoot"); if(pf) pf.style.display=(screen==="screen-teacher")?"none":"block";
+}
+function sanitize(s){return (s||"").replace(/[^\p{L}\p{N}_-]/gu,"_").slice(0,40)||"Datei";}
+function asciiName(s){
+  return (s||"")
+    .replace(/ä/g,"ae").replace(/ö/g,"oe").replace(/ü/g,"ue")
+    .replace(/Ä/g,"Ae").replace(/Ö/g,"Oe").replace(/Ü/g,"Ue").replace(/ß/g,"ss")
+    .normalize("NFKD").replace(/[\u0300-\u036f]/g,"")
+    .replace(/[^A-Za-z0-9_-]/g,"_").replace(/_+/g,"_").replace(/^_|_$/g,"")
+    .slice(0,40) || "Datei";
+}
+function fileSafe(s){return (s||"").replace(/[\/\\:*?"<>|\u0000-\u001f]/g,"").replace(/\s+/g," ").trim().slice(0,90)||"Datei";}
+function downloadBlob(blob,filename){
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download=filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+}
+
+let studentVorname="", studentNachname="";
+
+/* Start */
+$("start-btn").addEventListener("click",()=>{
+  const v=$("vorname").value.trim(), n=$("nachname").value.trim();
+  if(!v||!n){$("start-err").textContent="Bitte Vor- und Nachnamen eintragen.";return;}
+  studentVorname=v; studentNachname=n;
+  $("who-name").textContent=v+" "+n;
+  prevValue=""; recs=[]; $("editor").value="";
+  $("charcount").textContent="0";
+  show("screen-editor");
+  setTimeout(()=>$("editor").focus(),40);
+});
+$("vorname").addEventListener("keydown",e=>{if(e.key==="Enter")$("nachname").focus();});
+$("nachname").addEventListener("keydown",e=>{if(e.key==="Enter")$("start-btn").click();});
+$("to-teacher").addEventListener("click",e=>{e.preventDefault();show("screen-teacher");});
+$("back-start").addEventListener("click",e=>{e.preventDefault();show("screen-start");});
+
+/* Editor-Tracking */
+const ed=$("editor");
+function updateCharcount(){
+  let n=0; for(const r of recs){ if(r.src!=="s") n++; }
+  $("charcount").textContent=String(n);
+}
+ed.addEventListener("paste",()=>{justPasted=true;});
+ed.addEventListener("drop",()=>{justPasted=true;});
+ed.addEventListener("input",()=>{
+  reconcile(ed.value,justPasted,Date.now());
+  justPasted=false;
+  updateCharcount();
+});
+
+/* Export: erzeugt NUR die Text-PDF (mit rotem Moodle-Hinweis); die Zeiterfassungs- und
+   Escape-Room-Daten stecken verschlüsselt (als %TRACKDATA) im PDF und sind nur mit dem
+   Feiditor-Code (Anzahl Buchstaben im Vornamen × 1104) durch die Lehrkraft auslesbar. */
+$("export-btn").addEventListener("click",async()=>{
+  const btn=$("export-btn"); const text=ed.value;
+  const name=studentVorname+" "+studentNachname;
+  btn.disabled=true; const old=btn.textContent; btn.textContent="Erzeuge PDF…";
+  try{
+    const payload=buildPayload(name,text);
+    // Escape-Room-Daten zusätzlich (versteckt) ins PDF einbetten
+    if(window.__ESCAPE_DATA__){
+      payload.e={
+        fn:window.__ESCAPE_DATA__.firstName||"",
+        ln:window.__ESCAPE_DATA__.lastName||"",
+        bd:window.__ESCAPE_DATA__.birthDate||"",
+        cd:window.__ESCAPE_DATA__.code||""
+      };
+    }
+    const code=_kf(studentVorname);              // Feiditor-Code: NICHT der Escape-Room-Code
+    const bundle=await aesEncrypt(JSON.stringify(payload),code);
+
+    const pdfName=fileSafe("Text von "+studentVorname)+".pdf";
+
+    // PDF: Text + roter Moodle-Hinweis; Tracking- und Escape-Daten verschlüsselt als %TRACKDATA-Reserve
+    const pdfStr=buildPdf({name,body:text,trackB64:bundle});
+    const u8=new Uint8Array(pdfStr.length);
+    for(let i=0;i<pdfStr.length;i++)u8[i]=pdfStr.charCodeAt(i)&0xFF;
+
+    downloadBlob(new Blob([u8],{type:"application/pdf"}), pdfName);
+
+    btn.textContent="PDF erstellt ✓";
+    setTimeout(()=>{ btn.textContent=old; }, 2200);
+  }catch(err){ alert("Fehler beim Erzeugen der PDF: "+err.message); btn.textContent=old; }
+  finally{ btn.disabled=false; }
+});
+
+/* Lehrkraft: PDF laden + Code */
+let teacherBundle=null;
+function readPdfFile(file){
+  $("teacher-err").textContent=""; $("result").innerHTML="";
+  $("code-area").classList.add("hidden"); teacherBundle=null;
+  const fr=new FileReader();
+  fr.onload=()=>{
+    const bytes=new Uint8Array(fr.result);
+    let str=""; for(let i=0;i<bytes.length;i++) str+=String.fromCharCode(bytes[i]);
+    const mm=str.match(/%TRACKDATA (\S+)/);
+    if(!mm){$("teacher-err").textContent="In dieser PDF wurden keine Tracking-Daten gefunden.";return;}
+    teacherBundle=mm[1];
+    $("code-area").classList.remove("hidden");
+    setTimeout(()=>$("code-input").focus(),40);
+  };
+  fr.onerror=()=>{$("teacher-err").textContent="Datei konnte nicht gelesen werden.";};
+  fr.readAsArrayBuffer(file);
+}
+$("pdf-input").addEventListener("change",e=>{const f=e.target.files[0];if(f)readPdfFile(f);});
+const dropZone=document.querySelector(".drop");
+["dragover","dragenter"].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.style.borderColor="#8a6a3c";}));
+["dragleave","drop"].forEach(ev=>dropZone.addEventListener(ev,e=>{e.preventDefault();dropZone.style.borderColor="";}));
+dropZone.addEventListener("drop",e=>{const f=e.dataTransfer.files[0];if(f)readPdfFile(f);});
+
+async function showTeacherResult(){
+  const code=$("code-input").value.trim();
+  $("teacher-err").textContent="";
+  if(!teacherBundle)return;
+  try{
+    const json=await aesDecrypt(teacherBundle,code);
+    const p=JSON.parse(json);
+    $("result").innerHTML=renderAnalysis(p);
+  }catch(err){
+    $("result").innerHTML="";
+    $("teacher-err").textContent="Falscher Code.";
+  }
+}
+$("code-btn").addEventListener("click",showTeacherResult);
+$("code-input").addEventListener("keydown",e=>{if(e.key==="Enter")showTeacherResult();});
+
+/* ============================================================
+   Auto-Start aus dem Escape-Room (überspringt die Anmeldung)
+   ============================================================ */
+function buildPrefill(tasks){
+  const lines=[];
+  tasks.forEach((task,i)=>{
+    lines.push("Aufgabe "+(i+1));
+    lines.push(task);
+    for(let k=0;k<8;k++) lines.push("");   // 8 Leerzeilen Lösungsraum
+  });
+  return lines.join("\n");
+}
+(function autoStartFromEscape(){
+  const D=window.__ESCAPE_DATA__;
+  if(!D) return;                                   // ohne Daten: normaler Anmeldebildschirm
+  studentVorname=(D.firstName||"").trim();
+  studentNachname=(D.lastName||"").trim();
+  $("who-name").textContent=(studentVorname+" "+studentNachname).trim();
+  const tasks=Array.isArray(D.tasks)?D.tasks:[];
+  const prefill=tasks.length?buildPrefill(tasks):"";
+  const now=Date.now();
+  ed.value=prefill;
+  prevValue=prefill;
+  recs=prefill.split("").map(()=>({src:"s",t:now}));   // vorbefüllter Text = System (grau, nicht gezählt)
+  updateCharcount();
+  show("screen-editor");
+  // Cursor an den Anfang des ersten Lösungsbereichs setzen (nach Aufgabe 1)
+  setTimeout(()=>{
+    ed.focus();
+    const firstGap=prefill.indexOf("\n\n");
+    const pos=firstGap>=0?firstGap+2:prefill.length;
+    try{ ed.setSelectionRange(pos,pos); }catch(e){}
+  },50);
+})();
+<\/script>
+</body>
+</html>
+
+</script>
+
+
+<script>
+/* ============================================================
+   GAME STATE & DATA
+   ============================================================ */
+
+const CODE_WORD = 'EUROPA';
+const FULL_CODE = 'EUROPA';
+
+// Bestätigungscode = Geburtstagszahl (TTMMJJJJ) * 1104 + magische Zahl
+const MAGIC = 11;
+function computeCode(birthDigits) {
+  // birthDigits = "TTMMJJJJ"
+  const n = parseInt(birthDigits, 10);
+  return String(n * 1104 + MAGIC);
+}
+
+const ROOMS = [
+  {
+    id: 1,
+    location: 'Frankfurt am Main · Römerberg',
+    name: 'Das Rathaus',
+    letter: 'E',
+    briefing: `<span class="speaker">Bürgermeisterin Bayraktar, 9:14 Uhr</span>
+      "Wir haben drei Stunden, bis die EU-Delegation eintrifft. Im Konferenzraum liegen acht Maßnahmenkarten – aber nur die Hälfte fällt in unsere kommunale Zuständigkeit. Bevor ich mich blamiere: <em>Welche sind es?</em>"`,
+    task: 'Wähle die Maßnahmen, die in die <strong>kommunale Zuständigkeit</strong> fallen.',
+    type: 'multi-select',
+  },
+  {
+    id: 2,
+    location: 'Berlin · Bundeskanzleramt',
+    name: 'Das Kabinett',
+    letter: 'U',
+    briefing: `<span class="speaker">Referent Dr. Wienholz, 10:42 Uhr</span>
+      "Vier Akten – vier Bundesgesetze. Die Bezeichnungen sind abgerissen. Bringe Gesetz und Wirkung wieder zusammen, sonst fliegt das halbe Briefing auseinander."`,
+    task: 'Löse <strong>beide Teile</strong>: Verbinde jedes Gesetz mit seiner Hauptwirkung (Teil 1) und vervollständige den Lückentext zur Textseite (Teil 2). Anschließend „Prüfen".',
+    type: 'matching',
+  },
+  {
+    id: 3,
+    location: 'Brüssel · Justus-Lipsius-Gebäude',
+    name: 'Der Ratssaal',
+    letter: 'R',
+    briefing: `<span class="speaker">Kommissarin Hoekstra, 12:30 Uhr</span>
+      "In wenigen Minuten beginnt die Sitzung. Sechs Politikfelder warten auf Einordnung: Welche regelt die <em>Europäische Union</em>, welche bleiben in <em>nationaler Hand</em>? Das Subsidiaritätsprinzip kennst du."`,
+    task: 'Ordne jedes Politikfeld der zuständigen Ebene zu – <strong>EU</strong> oder <strong>Mitgliedstaat</strong>.',
+    type: 'two-buckets',
+  },
+  {
+    id: 4,
+    location: 'New York · UN-Hauptquartier',
+    name: 'Die Vollversammlung',
+    letter: 'O',
+    briefing: `<span class="speaker">UN-Sondergesandte Okonjo, 14:05 Uhr</span>
+      "Ein verschlüsseltes Briefing aus dem Pariser Abkommen. Fünf Eckdaten – wenn du sie kennst, springt das Schloss auf."`,
+    task: 'Löse <strong>beide Teile</strong>: die Eckdaten des Pariser Abkommens (Teil 1) und den Lückentext zum Erklärfilm (Teil 2). Anschließend „Prüfen".',
+    type: 'cloze',
+  },
+  {
+    id: 5,
+    location: 'Brüssel · Strategiezimmer',
+    name: 'Die Vier Säulen',
+    letter: 'P',
+    briefing: `<span class="speaker">Klimaberaterin Vetter, 15:50 Uhr</span>
+      "Zwölf Maßnahmenkarten, vier Säulen nachhaltigen Wirtschaftens: <em>Effizienz – Suffizienz – Konsistenz – Partizipation</em>. Wer das Konzept verstanden hat, sortiert ohne Mühe."`,
+    task: 'Ordne jede Maßnahme der passenden <strong>Nachhaltigkeitsdimension</strong> zu. Klicke eine Karte, dann das Zielfeld.',
+    type: 'four-buckets',
+  },
+  {
+    id: 6,
+    location: 'Brüssel · Verhandlungssaal',
+    name: 'Die Synthese',
+    letter: 'A',
+    briefing: `<span class="speaker">Du, 17:23 Uhr</span>
+      "Letzte Tür. Sechs reale Klimaprobleme – beweise, dass du das Mehrebenensystem im Griff hast. Klicke ein Problem, wähle dann die zuständige Ebene."`,
+    task: 'Ordne jedem <strong>Klimaproblem</strong> die politisch passende <strong>Ebene</strong> zu.',
+    type: 'level-assign',
+  },
+];
+
+// ===== Puzzle data =====
+
+const PUZZLE_R1 = {
+  measures: [
+    { id: 'm1', text: 'Kommunale Wärmeplanung',                                correct: true,  expl: 'Pflicht für Gemeinden seit 2024 (KWP-Gesetz). Wer wann auf was umsteigen kann, wird kommunal koordiniert.' },
+    { id: 'm2', text: 'Ausbau des Radwegenetzes innerorts',                    correct: true,  expl: 'Kommunale Planungshoheit über Verkehrsinfrastruktur – Bauleitplanung und Verkehrsführung.' },
+    { id: 'm3', text: 'CO₂-Preis für Heizöl und Benzin',                       correct: false, expl: 'Bundessache: BEHG, festgelegt im Bundestag. Kommunen haben keinen Einfluss auf den Preis.' },
+    { id: 'm4', text: 'Solar-Pflicht für Schulen und Verwaltungsgebäude',      correct: true,  expl: 'Die Kommune ist Eigentümerin und Bauherrin ihrer öffentlichen Gebäude – Pflicht möglich.' },
+    { id: 'm5', text: 'EU-Emissionshandel für Stahlwerke',                     correct: false, expl: 'EU-Ebene: Der ETS 1 wird in Brüssel beschlossen und EU-weit administriert.' },
+    { id: 'm6', text: 'Stadtbegrünung und Entsiegelung von Plätzen',           correct: true,  expl: 'Klassische kommunale Aufgabe – Stadtplanung, Klimaanpassung, Bebauungspläne.' },
+    { id: 'm7', text: 'Verbot von Verbrenner-Neuwagen ab 2035',                correct: false, expl: 'EU-Verordnung. Kommunen können maximal Umweltzonen für Bestandsfahrzeuge einrichten.' },
+    { id: 'm8', text: 'Atomausstieg / Kernkraftwerke abschalten',              correct: false, expl: 'Bundessache. Atomgesetz wird im Bundestag beschlossen.' },
+  ]
+};
+
+const PUZZLE_R2 = {
+  pairs: [
+    { left: 'KSG',   leftLong: 'Klimaschutzgesetz', rightId: 'r1', right: 'Sektorale CO₂-Reduktionsziele bis 2045' },
+    { left: 'BEHG',  leftLong: 'Brennstoffemissionshandelsgesetz', rightId: 'r2', right: 'Nationaler CO₂-Preis für Heizen und Verkehr' },
+    { left: 'GEG',   leftLong: 'Gebäudeenergiegesetz', rightId: 'r3', right: 'Heizungstausch und Gebäudesanierung' },
+    { left: 'BImSchG', leftLong: 'Bundes-Immissionsschutzgesetz', rightId: 'r4', right: 'Luftqualität, Lärm und Industrieanlagen' },
+  ]
+};
+
+const PUZZLE_R3 = {
+  buckets: [
+    { id: 'eu', label: 'EU-Kompetenz', desc: 'Brüssel regelt einheitlich' },
+    { id: 'ms', label: 'Mitgliedstaaten', desc: 'Berlin / Paris / Rom regeln eigenständig' },
+  ],
+  cards: [
+    { id: 'c1', text: 'CO₂-Grenzwerte für Neuwagen',                       bucket: 'eu', expl: 'Binnenmarkt – einheitliche Produktnormen.' },
+    { id: 'c2', text: 'Standortwahl für Kernkraftwerke',                   bucket: 'ms', expl: 'Energiemix-Souveränität (Art. 194 AEUV).' },
+    { id: 'c3', text: 'CBAM (Klimazoll an EU-Außengrenze)',                bucket: 'eu', expl: 'Außenhandelspolitik – ausschließliche EU-Kompetenz.' },
+    { id: 'c4', text: 'Höhe der Mehrwertsteuer auf Strom',                 bucket: 'ms', expl: 'Steuerhoheit liegt bei den Mitgliedstaaten (EU setzt nur Rahmen).' },
+    { id: 'c5', text: 'EU-Emissionshandel (ETS 1 / ETS 2)',                bucket: 'eu', expl: 'Grenzüberschreitender Markt – nur EU-weit sinnvoll.' },
+    { id: 'c6', text: 'Genehmigung von Windrad-Standorten',                bucket: 'ms', expl: 'Raumordnung und Baurecht: Bund und Länder.' },
+  ]
+};
+
+const PUZZLE_R4 = {
+  rows: [
+    { id: 'q1', before: 'Das ', strong: 'Pariser Abkommen ', after: 'wurde verabschiedet im Jahr', unit: '', answer: '2015', tolerance: 0, type: 'number' },
+    { id: 'q2', before: 'Pariser Abkommen-Ziel: Erwärmung deutlich unter 2 °C, anzustreben unter', strong: '', after: '°C', unit: '°C', answer: '1.5', tolerance: 0.05, type: 'number', accepts: ['1.5', '1,5'] },
+    { id: 'q3', before: 'Die EU strebt Klimaneutralität an bis zum Jahr', strong: '', after: '', unit: '', answer: '2050', tolerance: 0, type: 'number' },
+    { id: 'q4', before: 'Reduktionsziel der EU bis 2030 gegenüber 1990:', strong: '', after: 'Prozent', unit: '%', answer: '55', tolerance: 0, type: 'number' },
+    { id: 'q5', before: 'NDC steht für Nationally Determined', strong: '', after: '', unit: '', answer: 'Contributions', type: 'word', accepts: ['contributions', 'contribution'] },
+  ]
+};
+
+const PUZZLE_R5 = {
+  buckets: [
+    { id: 'eff',  label: 'Effizienz',     desc: 'Mehr Output je Einheit Input' },
+    { id: 'suf',  label: 'Suffizienz',    desc: 'Bewusst weniger verbrauchen' },
+    { id: 'kon',  label: 'Konsistenz',    desc: 'Im Stoffkreislauf der Natur bleiben' },
+    { id: 'par',  label: 'Partizipation', desc: 'Bürger:innen mitgestalten lassen' },
+  ],
+  cards: [
+    { id: 'd1',  text: 'E-Auto statt Verbrenner',           bucket: 'eff' },
+    { id: 'd2',  text: 'LED statt Glühbirne',               bucket: 'eff' },
+    { id: 'd3',  text: 'Wärmepumpe statt Gasheizung',       bucket: 'eff' },
+    { id: 'd4',  text: 'Weniger Flugreisen',                bucket: 'suf' },
+    { id: 'd5',  text: 'Car-Sharing statt Zweitwagen',      bucket: 'suf' },
+    { id: 'd6',  text: 'Tempolimit 130 auf Autobahnen',     bucket: 'suf' },
+    { id: 'd7',  text: 'Solarstrom statt Kohlestrom',       bucket: 'kon' },
+    { id: 'd8',  text: 'Recycling-Beton im Hochbau',        bucket: 'kon' },
+    { id: 'd9',  text: 'Holzbau statt Stahl-Beton',         bucket: 'kon' },
+    { id: 'd10', text: 'Klimabürgerrat einberufen',         bucket: 'par' },
+    { id: 'd11', text: 'Energiegenossenschaft gründen',     bucket: 'par' },
+    { id: 'd12', text: 'Volksinitiative zum Tempolimit',    bucket: 'par' },
+  ]
+};
+
+const PUZZLE_R6 = {
+  levels: [
+    { id: 'kom', label: 'Kommune' },
+    { id: 'bun', label: 'Bund' },
+    { id: 'eu',  label: 'EU' },
+    { id: 'glo', label: 'Global / UN' },
+  ],
+  cases: [
+    { id: 'p1', text: 'Schutz der Ozonschicht: Verbot von FCKW weltweit',     level: 'glo', expl: 'Montrealer Protokoll 1987 – nur global wirksam regelbar.' },
+    { id: 'p2', text: 'CO₂-Grenzwerte für neue Pkw in ganz Europa',           level: 'eu',  expl: 'EU-Binnenmarkt: einheitliche Fahrzeugnormen.' },
+    { id: 'p3', text: 'Pflicht zum Heizungstausch in Wohngebäuden',           level: 'bun', expl: 'GEG – Bundesgesetz zur Gebäudeenergie.' },
+    { id: 'p4', text: 'Reduktion des internationalen Flugverkehrs',           level: 'glo', expl: 'ICAO-CORSIA: nur internationale Vereinbarung greift.' },
+    { id: 'p5', text: 'Begrünung des Marktplatzes und Entsiegelung',          level: 'kom', expl: 'Kommunale Stadtplanung und Bebauungsplan.' },
+    { id: 'p6', text: 'Sektorale Klimaziele für Verkehr und Industrie',       level: 'bun', expl: 'KSG – nationale Sektorziele werden vom Bundestag festgelegt.' },
+  ]
+};
+
+// ===== State =====
+
+let state = {
+  screen: 'name',    // 'name' | 'intro' | 'lib1'..'lib6' | 'room1'..'room6' | 'final'
+  firstName: '',
+  lastName: '',
+  birthDate: '',     // 'TT.MM.JJJJ'
+  code: '',          // = Geburtstagszahl * 1104 + MAGIC
+  solved: [false, false, false, false, false, false],
+  letters: ['_', '_', '_', '_', '_', '_'],
+  // Mistakes per room: array of first-submission errors per room
+  mistakes: [null, null, null, null, null, null],  // each: { attempts, errors: [...] }
+  attempts: [0, 0, 0, 0, 0, 0],
+  completedAt: null,
+};
+window.state = state;
+
+// Capture first-attempt mistakes only. Increments attempts on every call.
+function recordAttempt(roomIdx, errorData) {
+  state.attempts[roomIdx]++;
+  if (state.attempts[roomIdx] === 1 && errorData && errorData.errors && errorData.errors.length > 0) {
+    state.mistakes[roomIdx] = errorData;
+  }
+}
+
+/* ============================================================
+   MINI PDF WRITER (self-contained, no dependencies)
+   Generates PDF 1.4 with Helvetica + Helvetica-Bold (WinAnsi)
+   ============================================================ */
+
+const WIN_ANSI_MAP = {
+  'ä': 0xE4, 'ö': 0xF6, 'ü': 0xFC, 'Ä': 0xC4, 'Ö': 0xD6, 'Ü': 0xDC, 'ß': 0xDF,
+  '€': 0x80, '‚': 0x82, '„': 0x84, '…': 0x85, '†': 0x86, '‡': 0x87,
+  '‰': 0x89, '‹': 0x8B, "\u2018": 0x91, "\u2019": 0x92, '\u201C': 0x93, '\u201D': 0x94,
+  '•': 0x95, '–': 0x96, '—': 0x97, '™': 0x99, '›': 0x9B,
+  '¡': 0xA1, '«': 0xAB, '»': 0xBB, '·': 0xB7, '×': 0xD7, '°': 0xB0,
+  '²': 0xB2, '³': 0xB3, '½': 0xBD, '¼': 0xBC, '¾': 0xBE, '¿': 0xBF,
+};
+const FALLBACK_MAP = {
+  '₀':'0','₁':'1','₂':'2','₃':'3','₄':'4','₅':'5','₆':'6','₇':'7','₈':'8','₉':'9',
+  '⁰':'0','¹':'1','⁴':'4','⁵':'5','⁶':'6','⁷':'7','⁸':'8','⁹':'9',
+  '→':'->','←':'<-','↑':'^','↓':'v','✓':'v','✗':'x','✕':'x','★':'*','☆':'*',
+  '\u00A0':' ','\u2009':' ','\u200B':'',
+};
+
+function encodeWinAnsi(str) {
+  const bytes = [];
+  for (const ch of str) {
+    const code = ch.charCodeAt(0);
+    if (code < 128) bytes.push(code);
+    else if (WIN_ANSI_MAP[ch] !== undefined) bytes.push(WIN_ANSI_MAP[ch]);
+    else if (FALLBACK_MAP[ch] !== undefined) {
+      for (const sub of FALLBACK_MAP[ch]) bytes.push(sub.charCodeAt(0) & 0xFF);
+    } else if (code <= 255) bytes.push(code);
+    else bytes.push(0x3F);
+  }
+  return bytes;
+}
+
+// Helvetica width table (1000 units = 1em). Approximate from AFM.
+const HELV_W = (() => {
+  const w = new Array(256).fill(500);
+  const widths = {
+    ' ':278,'!':278,'"':355,'#':556,'$':556,'%':889,'&':667,"'":191,'(':333,')':333,
+    '*':389,'+':584,',':278,'-':333,'.':278,'/':278,'0':556,'1':556,'2':556,'3':556,
+    '4':556,'5':556,'6':556,'7':556,'8':556,'9':556,':':278,';':278,'<':584,'=':584,
+    '>':584,'?':556,'@':1015,'A':667,'B':667,'C':722,'D':722,'E':667,'F':611,'G':778,
+    'H':722,'I':278,'J':500,'K':667,'L':556,'M':833,'N':722,'O':778,'P':667,'Q':778,
+    'R':722,'S':667,'T':611,'U':722,'V':667,'W':944,'X':667,'Y':667,'Z':611,'[':278,
+    '\\':278,']':278,'^':469,'_':556,'`':333,'a':556,'b':556,'c':500,'d':556,'e':556,
+    'f':278,'g':556,'h':556,'i':222,'j':222,'k':500,'l':222,'m':833,'n':556,'o':556,
+    'p':556,'q':556,'r':333,'s':500,'t':278,'u':556,'v':500,'w':722,'x':500,'y':500,
+    'z':500,'{':334,'|':260,'}':334,'~':584,
+    'ä':556,'ö':556,'ü':556,'Ä':667,'Ö':778,'Ü':722,'ß':611,
+    '€':556,'–':556,'—':1000,'«':556,'»':556,'·':278,'°':400,'•':350,
+  };
+  for (const k in widths) {
+    const code = WIN_ANSI_MAP[k] !== undefined ? WIN_ANSI_MAP[k] : k.charCodeAt(0);
+    if (code < 256) w[code] = widths[k];
+  }
+  return w;
+})();
+function pdfStringWidth(str, fontSize, isBold) {
+  const bytes = encodeWinAnsi(str);
+  let total = 0;
+  for (const b of bytes) total += (HELV_W[b] || 500) * (isBold ? 1.04 : 1);
+  return total * fontSize / 1000;
+}
+
+class PdfDoc {
+  constructor() {
+    this.pages = [];
+    this.pageW = 595; this.pageH = 842; // A4 in pt
+    this.margin = 56;
+    this.cursorY = 0;
+    this.currentContent = [];
+  }
+  startPage() {
+    this.cursorY = this.pageH - this.margin;
+    this.currentContent = [];
+  }
+  endPage() {
+    this.pages.push({ content: this.currentContent.join('\n') });
+  }
+  _escapedString(str) {
+    const bytes = encodeWinAnsi(str);
+    let s = '(';
+    for (const b of bytes) {
+      if (b === 0x28 || b === 0x29 || b === 0x5C) s += '\\';
+      s += String.fromCharCode(b);
+    }
+    s += ')';
+    return s;
+  }
+  text(str, x, y, fontSize, isBold, color) {
+    const fontKey = isBold ? 'F2' : 'F1';
+    const c = color || [0, 0, 0];
+    const pdfStr = this._escapedString(str);
+    let cmd = `${c[0]/255} ${c[1]/255} ${c[2]/255} rg\nBT\n/${fontKey} ${fontSize} Tf\n${x} ${y} Td\n${pdfStr} Tj\nET`;
+    this.currentContent.push(cmd);
+  }
+  rect(x, y, w, h, fill, stroke) {
+    let cmd = '';
+    if (fill) cmd += `${fill[0]/255} ${fill[1]/255} ${fill[2]/255} rg\n`;
+    if (stroke) cmd += `${stroke[0]/255} ${stroke[1]/255} ${stroke[2]/255} RG\n`;
+    cmd += `${x} ${y} ${w} ${h} re\n`;
+    if (fill && stroke) cmd += 'B';
+    else if (fill) cmd += 'f';
+    else if (stroke) cmd += 'S';
+    this.currentContent.push(cmd);
+  }
+  line(x1, y1, x2, y2, color, width) {
+    const c = color || [0,0,0];
+    let cmd = `${c[0]/255} ${c[1]/255} ${c[2]/255} RG\n${width||0.5} w\n${x1} ${y1} m ${x2} ${y2} l S`;
+    this.currentContent.push(cmd);
+  }
+  paragraph(str, x, y, width, fontSize, isBold, color, leading) {
+    if (!leading) leading = fontSize * 1.4;
+    const words = String(str).split(/\s+/);
+    let line = '';
+    let curY = y;
+    for (const word of words) {
+      if (!word) continue;
+      const test = line ? line + ' ' + word : word;
+      if (pdfStringWidth(test, fontSize, isBold) <= width) {
+        line = test;
+      } else {
+        if (line) {
+          this.text(line, x, curY, fontSize, isBold, color);
+          curY -= leading;
+          line = word;
+        } else {
+          this.text(word, x, curY, fontSize, isBold, color);
+          curY -= leading;
+        }
+      }
+    }
+    if (line) {
+      this.text(line, x, curY, fontSize, isBold, color);
+      curY -= leading;
+    }
+    return curY;
+  }
+  build() {
+    const objects = [null, null,  // catalog, pages
+      '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>',
+      '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica-Bold /Encoding /WinAnsiEncoding >>',
+    ];
+    const pageIds = [];
+    for (const page of this.pages) {
+      objects.push(`<< /Length ${page.content.length} >>\nstream\n${page.content}\nendstream`);
+      const contentId = objects.length;
+      objects.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${this.pageW} ${this.pageH}] /Resources << /Font << /F1 3 0 R /F2 4 0 R >> >> /Contents ${contentId} 0 R >>`);
+      pageIds.push(objects.length);
+    }
+    objects[1] = `<< /Type /Pages /Kids [${pageIds.map(i => i + ' 0 R').join(' ')}] /Count ${pageIds.length} >>`;
+    objects[0] = '<< /Type /Catalog /Pages 2 0 R >>';
+
+    let pdf = '%PDF-1.4\n%\xC4\xC5\xC6\xC7\n';
+    const offsets = [0];
+    for (let i = 0; i < objects.length; i++) {
+      offsets.push(pdf.length);
+      pdf += `${i+1} 0 obj\n${objects[i]}\nendobj\n`;
+    }
+    const xrefOffset = pdf.length;
+    pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+    for (let i = 1; i <= objects.length; i++) pdf += String(offsets[i]).padStart(10, '0') + ' 00000 n \n';
+    pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`;
+    return pdf;
+  }
+  toBase64() {
+    const pdf = this.build();
+    return btoa(pdf);
+  }
+}
+
+/* ============================================================
+   MISTAKES PDF — generated client-side at end of game
+   ============================================================ */
+
+/* ============================================================
+   LÖSUNGSERLÄUTERUNGEN (für PDF 1, Seite 2)
+   ============================================================ */
+const ROOM_LABELS = [
+  'Raum 01 · Das Rathaus (Kommunale Ebene)',
+  'Raum 02 · Das Kabinett (Bundesebene)',
+  'Raum 03 · Der Ratssaal (EU-Ebene)',
+  'Raum 04 · Die Vollversammlung (Globale Ebene)',
+  'Raum 05 · Die Vier Säulen (Nachhaltigkeitsdimensionen)',
+  'Raum 06 · Die Synthese (Subsidiarität)',
+];
+
+const SOLUTION_NOTES = [
+  { room: 'Raum 01 · Das Rathaus (Kommunale Ebene)',
+    text: 'In diesem Raum ging es darum, welche Klimaschutz-Maßnahmen eine Kommune (Stadt, Gemeinde, Landkreis) selbst beschließen darf. Kommunen besitzen nach Artikel 28 GG das Recht auf Selbstverwaltung und regeln alles, was nur ihr eigenes Gebiet betrifft. Richtig waren deshalb die kommunale Wärmeplanung, der Ausbau des innerörtlichen Radwegenetzes, die Solar-Pflicht für eigene öffentliche Gebäude (Schulen, Verwaltung) sowie Stadtbegrünung und Entsiegelung – allesamt Aufgaben der Stadtplanung und Verkehrsführung. Nicht kommunal sind dagegen der CO2-Preis (Bundesgesetz BEHG), der EU-Emissionshandel für Industrieanlagen, das Verbrenner-Aus 2035 (EU-Verordnung) und der Atomausstieg (Bundesgesetz), weil diese bundes- oder europaweit einheitlich gelten müssen. Faustregel: Kommunal ist eine Maßnahme dann, wenn die Stadt sie allein umsetzen könnte, ohne dass Berlin oder Brüssel etwas dagegen tun kann.' },
+  { room: 'Raum 02 · Das Kabinett (Bundesebene)',
+    text: 'Hier solltest du vier zentrale Bundesgesetze der deutschen Klimapolitik ihrer Hauptwirkung zuordnen. Das Klimaschutzgesetz (KSG) setzt die Ziele: Es legt sektorale CO2-Reduktionsziele fest und steuert auf Klimaneutralität bis 2045 zu. Das Brennstoffemissionshandelsgesetz (BEHG) lenkt über den Preis, indem es einen nationalen CO2-Preis auf das Heizen und den Verkehr erhebt und so fossile Brennstoffe verteuert. Das Gebäudeenergiegesetz (GEG) regelt den Heizungstausch und die Gebäudesanierung, während das Bundes-Immissionsschutzgesetz (BImSchG) vor Luftschadstoffen, Lärm und Geruch schützt und Industrieanlagen genehmigt. Als Eselsbrücke gilt: KSG = Ziele, BEHG = Preise, GEG = Gebäude, BImSchG = Anlagen.' },
+  { room: 'Raum 03 · Der Ratssaal (EU-Ebene)',
+    text: 'In diesem Raum stand das Subsidiaritätsprinzip im Mittelpunkt (Art. 5 EUV): Die EU wird nur tätig, wenn ein Ziel auf nationaler Ebene nicht ausreichend erreicht werden kann – kurz „so lokal wie möglich, so weit oben wie nötig". Eine EU-Kompetenz besteht vor allem dort, wo Wirtschaft und Umwelt grenzüberschreitend sind: bei einheitlichen Produktnormen wie CO2-Grenzwerten für Neuwagen, beim Emissionshandel (ETS) und beim Klimazoll CBAM, der zur ausschließlichen Außenhandelskompetenz der EU zählt. In nationaler Hand bleiben dagegen der Energiemix (Art. 194 AEUV – jedes Land wählt seine Kraftwerke selbst), die Höhe der Steuern (Steuerhoheit der Mitgliedstaaten) und die Genehmigung einzelner Standorte (Raumordnung und Baurecht). Merksatz: Beim Binnenmarkt und Außenhandel hat die EU das letzte Wort, bei Steuern und beim Energiemix bleibt es bei den Mitgliedstaaten.' },
+  { room: 'Raum 04 · Die Vollversammlung (Globale Ebene)',
+    text: 'Raum 4 prüfte die Eckdaten des Pariser Abkommens, des ersten verbindlichen globalen Klimaabkommens. Es wurde 2015 auf der Weltklimakonferenz COP 21 verabschiedet und strebt an, die Erderwärmung möglichst auf 1,5 °C zu begrenzen (deutlich unter 2 °C). Jeder Staat legt seine eigenen Klimabeiträge fest, die sogenannten NDC (Nationally Determined Contributions), und muss sie regelmäßig verschärfen. Die EU will bis 2050 klimaneutral werden und ihre Treibhausgase bis 2030 um 55 Prozent gegenüber 1990 senken. Globale Probleme wie der Schutz der Ozonschicht (Montrealer Protokoll) oder der internationale Flugverkehr (ICAO-CORSIA) lassen sich sinnvoll nur auf dieser weltweiten Ebene regeln.' },
+  { room: 'Raum 05 · Die Vier Säulen (Nachhaltigkeitsdimensionen)',
+    text: 'Hier solltest du zwölf Maßnahmen vier Strategien nachhaltigen Wirtschaftens zuordnen. Effizienz bedeutet, denselben Nutzen mit weniger Ressourcen zu erreichen (z. B. E-Auto statt Verbrenner, LED, Wärmepumpe). Suffizienz heißt, bewusst weniger zu verbrauchen (z. B. weniger fliegen, Car-Sharing, Tempolimit). Konsistenz bedeutet, im Stoffkreislauf der Natur zu bleiben und naturverträgliche Stoffe zu nutzen (z. B. Solarstrom, Holzbau, Recycling-Beton). Partizipation meint schließlich, Bürgerinnen und Bürger mitentscheiden zu lassen (z. B. Klimabürgerrat, Energiegenossenschaft, Volksinitiative). Wichtig ist: Die vier Säulen sind keine Alternativen, sondern ergänzen sich – eine gute Klimapolitik nutzt alle vier.' },
+  { room: 'Raum 06 · Die Synthese (Subsidiarität)',
+    text: 'Im letzten Raum hast du alles verknüpft und sechs reale Klimaprobleme der jeweils passenden Ebene zugeordnet. Die Entscheidungsregel lautet erneut „so lokal wie möglich, so weit oben wie nötig" – frage dich also, wo die Folgen eines Problems enden. Global geregelt werden grenzüberschreitende Themen wie das weltweite FCKW-Verbot (Montrealer Protokoll) und der internationale Flugverkehr. Auf EU-Ebene liegen einheitliche Binnenmarkt-Regeln wie CO2-Grenzwerte für neue Pkw, während der Bund über Gesetze wie das GEG (Heizungstausch) und das KSG (sektorale Klimaziele) zuständig ist. Rein örtliche Aufgaben wie die Begrünung und Entsiegelung des Marktplatzes bleiben dagegen Sache der Kommune.' },
+];
+
+/* ============================================================
+   PDF 1 — „Überblick deiner Antworten & Erläuterungen"
+   ============================================================ */
+
+function generateMistakesPdf() {
+  const doc = new PdfDoc();
+  const W = doc.pageW, H = doc.pageH, M = doc.margin;
+  const CONTENT_W = W - 2 * M;
+  // Colors
+  const PRIMARY = [27, 73, 101];
+  const GOLD = [212, 175, 55];
+  const RED = [155, 61, 61];
+  const GREEN = [47, 125, 65];
+  const TEXT_MUTE = [85, 85, 85];
+  const TEXT = [25, 25, 25];
+
+  function newPage() {
+    doc.startPage();
+    // Header band
+    doc.rect(0, H - 80, W, 80, PRIMARY);
+    doc.text('Überblick deiner Antworten & Erläuterungen', M, H - 40, 17, true, [255, 255, 255]);
+    doc.text('PoWi · E-Phase · E2.3 · Escape-Room „EU-Klimagipfel"', M, H - 60, 10, false, GOLD);
+    return H - 80 - 24;  // start Y for content
+  }
+  function pageBreak() { doc.endPage(); return newPage(); }
+  function ensure(y, needed) {
+    if (y - needed < 60) return pageBreak();
+    return y;
+  }
+
+  let y = newPage();
+
+  // Pflichthinweis (fett, ganz oben)
+  doc.rect(M, y - 46, CONTENT_W, 46, [248, 235, 221]);
+  doc.rect(M, y - 46, 3, 46, GOLD);
+  y = doc.paragraph(
+    'Diese Datei musst du bei Moodle in der dafür vorgesehenen Abgabe hochladen, um deinem Lehrer nachzuweisen, dass du den Escape-Room erfolgreich absolviert hast.',
+    M + 12, y - 17, CONTENT_W - 24, 10.5, true, PRIMARY, 13.5);
+  y -= 18;
+
+  // Identification block
+  const blockH = 80;
+  doc.rect(M, y - blockH, CONTENT_W, blockH, [244, 248, 251]);
+  doc.rect(M, y - blockH, 3, blockH, GOLD);
+  doc.text('SCHÜLERIN / SCHÜLER', M + 14, y - 16, 8.5, true, GOLD);
+  doc.text(state.firstName + ' ' + state.lastName, M + 14, y - 31, 13, true, PRIMARY);
+  doc.text('GEBURTSDATUM', M + 14, y - 50, 8.5, true, GOLD);
+  doc.text(state.birthDate, M + 14, y - 64, 11, false, TEXT);
+  doc.text('BESTÄTIGUNGSCODE', M + 300, y - 16, 8.5, true, GOLD);
+  doc.text(state.code, M + 300, y - 31, 13, true, PRIMARY);
+  doc.text('ABGESCHLOSSEN AM', M + 300, y - 50, 8.5, true, GOLD);
+  doc.text(fmtDateTime(state.completedAt), M + 300, y - 64, 11, false, TEXT);
+  y -= blockH + 16;
+
+  // Intro paragraph
+  y = doc.paragraph(
+    'Dieses Dokument fasst zusammen, welche Antworten du in jedem Rätselraum beim ersten Versuch gegeben hast. ' +
+    'Du hast jeden Raum am Ende erfolgreich gelöst – diese Übersicht zeigt nur, wo es anfangs noch hakte. ' +
+    'Auf der zweiten Seite findest du ausführliche Lösungserläuterungen zum Nacharbeiten.',
+    M, y, CONTENT_W, 10.5, false, TEXT, 14
+  );
+  y -= 10;
+
+  // Summary stats
+  const totalErrors = state.mistakes.reduce((a, m) => a + (m && m.errors ? m.errors.length : 0), 0);
+  const perfectRooms = state.attempts.filter((a, i) => a >= 1 && (!state.mistakes[i] || !state.mistakes[i].errors || state.mistakes[i].errors.length === 0)).length;
+  doc.rect(M, y - 36, CONTENT_W, 36, [248, 251, 247]);
+  doc.rect(M, y - 36, 3, 36, GREEN);
+  doc.text('ÜBERSICHT', M + 14, y - 14, 8.5, true, GREEN);
+  doc.text(`Räume im ersten Versuch fehlerfrei: ${perfectRooms} von 6   ·   Fehler im ersten Versuch insgesamt: ${totalErrors}`,
+           M + 14, y - 27, 10.5, true, TEXT);
+  y -= 50;
+
+  // Per-room sections
+
+  for (let i = 0; i < 6; i++) {
+    y = ensure(y, 60);
+    // Section title
+    doc.text(ROOM_LABELS[i], M, y, 13, true, PRIMARY);
+    // Underline
+    doc.line(M, y - 4, M + CONTENT_W, y - 4, GOLD, 0.8);
+    y -= 18;
+
+    const attempts = state.attempts[i];
+    const m = state.mistakes[i];
+    const attemptsLabel = attempts === 1 ? '1 Versuch' : attempts + ' Versuche';
+
+    if (!m || !m.errors || m.errors.length === 0) {
+      // Perfect
+      y = doc.paragraph('Fehlerfrei beim ersten Versuch gelöst. (' + attemptsLabel + ')', M, y, CONTENT_W, 10.5, true, GREEN, 14);
+      y -= 8;
+      continue;
+    }
+
+    y = doc.paragraph('Insgesamt benötigt: ' + attemptsLabel + '. Beim ersten Versuch waren folgende Punkte falsch:',
+                      M, y, CONTENT_W, 10.5, false, TEXT_MUTE, 14);
+    y -= 6;
+
+    for (const err of m.errors) {
+      y = ensure(y, 60);
+      // Bullet + item description
+      doc.text('•', M, y, 11, true, RED);
+
+      if (err.kind === 'falsch_gewaehlt') {
+        // Room 1: wrong selection
+        y = doc.paragraph('Falsch ausgewählt: "' + err.item + '"', M + 14, y, CONTENT_W - 14, 10.5, true, TEXT, 13);
+        y = doc.paragraph('→ ' + err.explanation, M + 14, y, CONTENT_W - 14, 10, false, TEXT_MUTE, 13);
+      } else if (err.kind === 'uebersehen') {
+        y = doc.paragraph('Übersehen (gehörte dazu): "' + err.item + '"', M + 14, y, CONTENT_W - 14, 10.5, true, TEXT, 13);
+        y = doc.paragraph('→ ' + err.explanation, M + 14, y, CONTENT_W - 14, 10, false, TEXT_MUTE, 13);
+      } else if (err.kind === 'falsch_zugeordnet') {
+        y = doc.paragraph(err.item, M + 14, y, CONTENT_W - 14, 10.5, true, TEXT, 13);
+        y = doc.paragraph('Du gewählt: ' + err.wrongAnswer, M + 14, y, CONTENT_W - 14, 10, false, RED, 13);
+        y = doc.paragraph('Richtig wäre: ' + err.correctAnswer, M + 14, y, CONTENT_W - 14, 10, true, GREEN, 13);
+      } else if (err.kind === 'falsch_einsortiert') {
+        y = doc.paragraph('"' + err.item + '"', M + 14, y, CONTENT_W - 14, 10.5, true, TEXT, 13);
+        y = doc.paragraph('Du einsortiert in: ' + err.wrongAnswer + '   ·   Richtig: ' + err.correctAnswer,
+                          M + 14, y, CONTENT_W - 14, 10, false, TEXT_MUTE, 13);
+        if (err.explanation) {
+          y = doc.paragraph('→ ' + err.explanation, M + 14, y, CONTENT_W - 14, 10, false, TEXT_MUTE, 13);
+        }
+      } else if (err.kind === 'falsche_eingabe') {
+        y = doc.paragraph(err.item, M + 14, y, CONTENT_W - 14, 10.5, true, TEXT, 13);
+        y = doc.paragraph('Deine Eingabe: "' + err.wrongAnswer + '"   ·   Richtig: ' + err.correctAnswer,
+                          M + 14, y, CONTENT_W - 14, 10, false, TEXT_MUTE, 13);
+      } else if (err.kind === 'falsche_ebene') {
+        y = doc.paragraph(err.item, M + 14, y, CONTENT_W - 14, 10.5, true, TEXT, 13);
+        y = doc.paragraph('Du zugeordnet zu: ' + err.wrongAnswer + '   ·   Richtig: ' + err.correctAnswer,
+                          M + 14, y, CONTENT_W - 14, 10, false, TEXT_MUTE, 13);
+        if (err.explanation) {
+          y = doc.paragraph('→ ' + err.explanation, M + 14, y, CONTENT_W - 14, 10, false, TEXT_MUTE, 13);
+        }
+      }
+      y -= 5;
+    }
+    y -= 10;
+  }
+
+  // Footer note
+  y = ensure(y, 50);
+  doc.line(M, y, M + CONTENT_W, y, [200, 200, 200], 0.4);
+  y -= 14;
+  doc.text('Bestätigungscode für Moodle: ' + state.code, M, y, 10, true, PRIMARY);
+  y -= 22;
+  doc.text('Copyright Jan-Rickmer Feindt', M, y, 8.5, false, TEXT_MUTE);
+
+  doc.endPage();
+
+  /* ---- Seite 2: Lösungserläuterungen ---- */
+  function headerSolutions() {
+    doc.startPage();
+    doc.rect(0, H - 80, W, 80, PRIMARY);
+    doc.text('Lösungserläuterungen', M, H - 40, 17, true, [255, 255, 255]);
+    doc.text('PoWi · E-Phase · E2.3 · Escape-Room „EU-Klimagipfel"', M, H - 60, 10, false, GOLD);
+    return H - 80 - 24;
+  }
+  function ensure2(yy, need) { if (yy - need < 60) { doc.endPage(); return headerSolutions(); } return yy; }
+
+  let y2 = headerSolutions();
+  y2 = doc.paragraph(
+    'Hier werden die richtigen Lösungen der sechs Rätselräume noch einmal genauer erklärt. ' +
+    'Nutze diese Seite, um den Stoff der Sitzung zu vertiefen und nachzuarbeiten.',
+    M, y2, CONTENT_W, 10.5, false, TEXT, 14);
+  y2 -= 10;
+
+  for (const note of SOLUTION_NOTES) {
+    y2 = ensure2(y2, 96);
+    doc.text(note.room, M, y2, 12.5, true, PRIMARY);
+    doc.line(M, y2 - 4, M + CONTENT_W, y2 - 4, GOLD, 0.8);
+    y2 -= 18;
+    y2 = doc.paragraph(note.text, M, y2, CONTENT_W, 10.5, false, TEXT, 14.5);
+    y2 -= 14;
+  }
+
+  y2 = ensure2(y2, 30);
+  doc.line(M, y2, M + CONTENT_W, y2, [200, 200, 200], 0.4);
+  y2 -= 14;
+  doc.text('Copyright Jan-Rickmer Feindt', M, y2, 8.5, false, TEXT_MUTE);
+
+  doc.endPage();
+  return doc.toBase64();
+}
+
+// Datum + Uhrzeit des Abschlusses formatieren
+function fmtDateTime(d) {
+  if (!d) d = new Date();
+  const date = d.toLocaleDateString('de-DE');
+  const time = d.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit' });
+  return date + ', ' + time + ' Uhr';
+}
+
+const root = document.getElementById('screenContainer');
+const sealsBox = document.getElementById('progressSeals');
+
+/* ============================================================
+   PROGRESS SEALS (top bar)
+   ============================================================ */
+
+function renderSeals() {
+  sealsBox.innerHTML = '';
+  for (let i = 0; i < 6; i++) {
+    // Library indicator (small square) before each room seal
+    const lib = document.createElement('div');
+    lib.className = 'seal library';
+    const isLibActive = (state.screen === 'lib' + (i + 1)) ||
+                        (state.screen === 'lib2alt' && i === 1) ||
+                        (state.screen === 'lib4alt' && i === 3);
+    if (isLibActive) {
+      lib.classList.add('active');
+    } else if (state.solved[i] || (state.screen === 'room' + (i + 1)) ||
+               (state.screen.startsWith('room') && parseInt(state.screen.slice(4)) > i + 1) ||
+               (state.screen.startsWith('lib') && parseInt(state.screen.slice(3)) > i + 1) ||
+               state.screen === 'final') {
+      lib.classList.add('visited');
+    }
+    sealsBox.appendChild(lib);
+
+    const s = document.createElement('div');
+    s.className = 'seal';
+    if (state.solved[i]) {
+      s.classList.add('solved');
+      s.textContent = CODE_WORD[i];
+    } else if (state.screen === 'room' + (i + 1)) {
+      s.classList.add('active');
+      s.textContent = i + 1;
+    } else {
+      s.textContent = i + 1;
+    }
+    sealsBox.appendChild(s);
+  }
+}
+
+/* ============================================================
+   SCREEN: INTRO
+   ============================================================ */
+
+function renderNameInput() {
+  state.screen = 'name';
+  renderSeals();
+  root.innerHTML = `
+    <div class="kicker">PoWi · E-Phase · E2.3 · Selbsterarbeitung</div>
+    <h1 class="title-mega">EU-Klimagipfel<br><em>Brüssel</em></h1>
+    <p class="lede">Bevor du den Gipfel betrittst, brauchen wir deinen Delegations-Ausweis.</p>
+
+    <div class="card card-accent" style="max-width: 620px;">
+      <h3 style="font-family: var(--font-display); font-size: 22px; margin-bottom: 18px;">Akkreditierung</h3>
+      <p style="margin-bottom: 22px; color: var(--c-text-mute);">
+        Trage deinen vollen Namen und dein Geburtsdatum ein. Beides erscheint später auf deinen beiden
+        Dateien für Moodle. Aus dem Geburtsdatum wird dein persönlicher Bestätigungscode errechnet.
+      </p>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+        <div>
+          <label for="firstNameInput" style="display:block; font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--c-gold); margin-bottom:6px;">Vorname</label>
+          <input id="firstNameInput" type="text" autocomplete="given-name" maxlength="40"
+                 style="width:100%; padding:12px 14px; background:rgba(6,12,26,0.7); border:1.5px solid var(--c-border); border-radius:2px; color:var(--c-text); font-family:var(--font-body); font-size:15px;"
+                 onkeydown="if(event.key==='Enter') document.getElementById('lastNameInput').focus()">
+        </div>
+        <div>
+          <label for="lastNameInput" style="display:block; font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--c-gold); margin-bottom:6px;">Nachname</label>
+          <input id="lastNameInput" type="text" autocomplete="family-name" maxlength="40"
+                 style="width:100%; padding:12px 14px; background:rgba(6,12,26,0.7); border:1.5px solid var(--c-border); border-radius:2px; color:var(--c-text); font-family:var(--font-body); font-size:15px;"
+                 onkeydown="if(event.key==='Enter') document.getElementById('birthInput').focus()">
+        </div>
+      </div>
+
+      <div style="margin-top:16px; max-width:260px;">
+        <label for="birthInput" style="display:block; font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:0.18em; text-transform:uppercase; color:var(--c-gold); margin-bottom:6px;">Geburtsdatum (TT.MM.JJJJ)</label>
+        <input id="birthInput" type="text" inputmode="numeric" maxlength="10" placeholder="TT.MM.JJJJ"
+               style="width:100%; padding:12px 14px; background:rgba(6,12,26,0.7); border:1.5px solid var(--c-border); border-radius:2px; color:var(--c-text); font-family:var(--font-body); font-size:15px;"
+               oninput="maskBirth(this)" onkeydown="if(event.key==='Enter') submitName()">
+      </div>
+
+      <div id="nameError" style="display:none; margin-top:14px; padding:10px 14px; background:var(--c-error-bg); border-left:3px solid var(--c-error); color:var(--c-text); font-size:13px; border-radius:2px;"></div>
+
+      <div class="btn-row" style="margin-top: 24px;">
+        <button class="btn btn-primary btn-arrow" onclick="submitName()">Weiter zum Briefing</button>
+      </div>
+    </div>
+  `;
+  // Autofocus
+  setTimeout(() => document.getElementById('firstNameInput')?.focus(), 100);
+}
+
+window.maskBirth = (el) => {
+  let v = el.value.replace(/[^0-9]/g, '').slice(0, 8);
+  let out = v;
+  if (v.length > 4) out = v.slice(0, 2) + '.' + v.slice(2, 4) + '.' + v.slice(4);
+  else if (v.length > 2) out = v.slice(0, 2) + '.' + v.slice(2);
+  el.value = out;
+};
+
+window.submitName = () => {
+  const fn = document.getElementById('firstNameInput').value.trim();
+  const ln = document.getElementById('lastNameInput').value.trim();
+  const bd = document.getElementById('birthInput').value.trim();
+  const err = document.getElementById('nameError');
+  function showErr(msg) { err.style.display = 'block'; err.textContent = msg; }
+  if (fn.length < 2 || ln.length < 2) {
+    showErr('Bitte trage deinen vollen Vor- und Nachnamen ein (jeweils mindestens 2 Zeichen).');
+    return;
+  }
+  const m = bd.match(/^(\d{2})\.(\d{2})\.(\d{4})$/);
+  if (!m) {
+    showErr('Bitte gib dein Geburtsdatum im Format TT.MM.JJJJ ein (z. B. 07.03.2009).');
+    return;
+  }
+  const dd = parseInt(m[1], 10), mm = parseInt(m[2], 10), yyyy = parseInt(m[3], 10);
+  if (dd < 1 || dd > 31 || mm < 1 || mm > 12 || yyyy < 1900 || yyyy > 2025) {
+    showErr('Das Geburtsdatum scheint nicht zu stimmen. Bitte prüfe Tag, Monat und Jahr.');
+    return;
+  }
+  state.firstName = fn;
+  state.lastName = ln;
+  state.birthDate = bd;
+  state.code = computeCode(m[1] + m[2] + m[3]);
+  renderIntro();
+};
+
+function renderIntro() {
+  state.screen = 'intro';
+  renderSeals();
+  root.innerHTML = `
+    <div class="kicker">PoWi · E-Phase · E2.3 · Briefing</div>
+    <h1 class="title-mega">Willkommen,<br><em>${state.firstName}</em></h1>
+    <p class="lede">Sechs Bibliotheksräume. Sechs Rätselräume. Ein Code.<br>Du hast 90 Minuten, das Mehrebenensystem zu beweisen.</p>
+
+    <div class="intro-grid">
+      <div class="card card-accent">
+        <p class="body-lg" style="font-family:var(--font-display); font-style:italic; font-size:18px; line-height:1.65;">
+          Brüssel. Beim entscheidenden EU-Klimagipfel droht der Abbruch: Die Mitgliedstaaten streiten,
+          wer für was zuständig ist. Du bist Teil einer Beraterdelegation und musst durch sechs Räume navigieren –
+          vom Frankfurter Rathaus bis zum Brüsseler Verhandlungssaal.
+        </p>
+        <p class="body-lg" style="margin-top:14px;">
+          Vor jedem Rätselraum betrittst du zuerst einen <strong style="color:var(--c-gold)">Bibliotheksraum</strong>.
+          Dort findest du genau das Wissen, das du im folgenden Rätsel brauchst.
+          <strong>Wenn du den Rätselraum betrittst, kannst du nicht mehr in die Bibliothek zurück</strong> – also lies aufmerksam und mach dir Notizen.
+        </p>
+      </div>
+
+      <aside class="intro-meta">
+        <dl>
+          <dt>Delegierte:r</dt>
+          <dd>${state.firstName} ${state.lastName}</dd>
+          <dt>Geburtsdatum</dt>
+          <dd>${state.birthDate}</dd>
+          <dt>Bearbeitungszeit</dt>
+          <dd>ca. 75–90 Minuten</dd>
+          <dt>Was du brauchst</dt>
+          <dd>Stift und Papier für Notizen aus den Bibliotheksräumen.</dd>
+          <dt>Am Ende</dt>
+          <dd>Am Ende lädst du in Moodle zwei PDF-Dateien hoch: deinen persönlichen Überblick (mit Bestätigungscode) und dein digitales Arbeitsblatt aus dem Feiditor.</dd>
+        </dl>
+      </aside>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary btn-arrow" onclick="goLibrary(1)">Erste Bibliothek betreten</button>
+      <button class="btn btn-ghost" onclick="showHelp()">Wie funktioniert das?</button>
+    </div>
+
+    <div id="helpBox" style="display:none; margin-top:24px;">
+      <div class="card">
+        <h3 style="font-size:20px; margin-bottom:12px;">Spielmechanik</h3>
+        <ul class="muted-list">
+          <li>Vor jedem Rätsel kommt ein <strong>Bibliotheksraum</strong> mit dem nötigen Wissen – mit Notizen kommst du sicher durch.</li>
+          <li>Sobald du den Rätselraum betrittst, kannst du nicht mehr in die Bibliothek zurück.</li>
+          <li>Falsche Eingaben werden farblich markiert und kurz erklärt. Du kannst nochmal probieren – aber jeder Fehler wird in deinem Protokoll vermerkt.</li>
+          <li>Wenn ein Raum gelöst ist, erscheint ein Buchstabe. Sammle alle sechs.</li>
+          <li>Am Ende lädst du in Moodle zwei PDF-Dateien hoch: deinen persönlichen Überblick und dein digitales Arbeitsblatt aus dem Feiditor.</li>
+        </ul>
+      </div>
+    </div>
+  `;
+}
+
+window.showHelp = () => {
+  const box = document.getElementById('helpBox');
+  box.style.display = box.style.display === 'none' ? 'block' : 'none';
+};
+
+/* ============================================================
+   SCREEN: ROOM HEADER (shared)
+   ============================================================ */
+
+function roomHeader(room) {
+  return `
+    <div class="room-header">
+      <div class="room-number">${String(room.id).padStart(2, '0')}</div>
+      <div class="room-meta">
+        <div class="room-location">${room.location}</div>
+        <div class="room-name">${room.name}</div>
+      </div>
+    </div>
+    <div class="card card-accent">
+      <div class="briefing">${room.briefing}</div>
+    </div>
+    <p class="body-lg" style="margin-top:8px; margin-bottom:0;"><strong style="color:var(--c-gold); font-family:var(--font-mono); font-size:11px; letter-spacing:0.18em;">DEINE AUFGABE</strong></p>
+    <p class="body-lg">${room.task}</p>
+  `;
+}
+
+function roomFooter(room, hintText, checkFn) {
+  return `
+    <div id="statusBox"></div>
+    <div id="hintBox" class="hint-box"><span class="label">Hinweis</span>${hintText}</div>
+    <div class="btn-row" style="align-items:center;">
+      <button class="btn btn-primary" onclick="${checkFn}">Prüfen</button>
+      <button class="hint-btn" onclick="showHint()">Hinweis anzeigen</button>
+    </div>
+  `;
+}
+
+window.showHint = () => {
+  const h = document.getElementById('hintBox');
+  if (h) h.classList.add('show');
+};
+
+function showStatus(type, label, msg) {
+  const box = document.getElementById('statusBox');
+  if (!box) return;
+  box.innerHTML = `<div class="status status-${type} show"><span class="label">${label}</span>${msg}</div>`;
+}
+
+/* ============================================================
+   LIBRARY ROOMS — Knowledge stations before each puzzle
+   ============================================================ */
+
+const LIBRARIES = [
+  // Library 1: Kommunale Ebene
+  {
+    id: 1,
+    location: 'Frankfurt am Main · Stadtarchiv',
+    name: 'Bibliothek der Kommune',
+    target: 'Raum 01 · Das Rathaus',
+    intro: 'Wofür ist eine Kommune (= Stadt, Gemeinde, Landkreis) eigentlich zuständig? Und was nicht?',
+    content: `
+      <div class="lib-section">
+        <div class="lib-section-title">Was ist eine "Kommune"?</div>
+        <p>
+          Kommunen sind <strong>Städte, Gemeinden und Landkreise</strong> – die unterste politische Ebene in Deutschland.
+          Sie sind durch Artikel 28 des Grundgesetzes mit dem Recht der <strong>Selbstverwaltung</strong> ausgestattet:
+          Sie dürfen in ihrem Gebiet alle Angelegenheiten der örtlichen Gemeinschaft eigenverantwortlich regeln –
+          soweit kein höherrangiges Gesetz das übernimmt.
+        </p>
+      </div>
+
+      <div class="lib-section">
+        <div class="lib-section-title">Womit beschäftigt sich eine Kommune?</div>
+        <p>Die Faustregel: <em>Was nur diese eine Stadt betrifft, regelt die Stadt.</em></p>
+        <div class="lib-grid">
+          <div class="lib-card">
+            <div class="lib-card-sub">Stadtplanung</div>
+            <div class="lib-card-title">Bauen und Grün</div>
+            <div class="lib-card-body">Bebauungspläne, Entsiegelung, Stadtbegrünung, Wo darf gebaut werden? Wo bleiben Parks?</div>
+          </div>
+          <div class="lib-card">
+            <div class="lib-card-sub">Verkehr vor Ort</div>
+            <div class="lib-card-title">Straßen und Radwege</div>
+            <div class="lib-card-body">Innerörtliches Straßennetz, Radwegausbau, Verkehrsführung, Tempo-30-Zonen.</div>
+          </div>
+          <div class="lib-card">
+            <div class="lib-card-sub">Wärme &amp; Energie</div>
+            <div class="lib-card-title">Kommunale Wärmeplanung</div>
+            <div class="lib-card-body">Seit 2024 Pflicht: Wo soll künftig mit Fernwärme, wo mit Wärmepumpe geheizt werden?</div>
+          </div>
+          <div class="lib-card">
+            <div class="lib-card-sub">Eigene Gebäude</div>
+            <div class="lib-card-title">Schulen, Verwaltung</div>
+            <div class="lib-card-body">Die Kommune ist Bauherrin: Sie kann z. B. Solar-Pflicht für eigene Schulen und Verwaltungsgebäude beschließen.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lib-section">
+        <div class="lib-section-title">Was darf die Kommune <em>nicht</em>?</div>
+        <p>
+          Alles, was bundes- oder europaweit einheitlich geregelt werden muss, ist <strong>nicht</strong> Sache der Kommune.
+          Eine Frankfurter Bürgermeisterin kann nicht den CO₂-Preis senken, das Verbrenner-Aus aufheben oder den Emissionshandel ändern.
+        </p>
+        <ul class="lib-bullets">
+          <li><strong>CO₂-Preis</strong> auf Heizöl und Benzin → Bundesgesetz (BEHG)</li>
+          <li><strong>EU-Emissionshandel</strong> für Industrieanlagen → EU-Verordnung</li>
+          <li><strong>Verbrenner-Aus</strong> für Neuwagen → EU-Verordnung</li>
+          <li><strong>Atomausstieg</strong> / Reaktorabschaltung → Bundesgesetz</li>
+        </ul>
+      </div>
+
+      <div class="lib-section">
+        <div class="lib-section-title">Faustregel für den nächsten Raum</div>
+        <p style="font-family:var(--font-display); font-style:italic; font-size:17px; color:var(--c-gold);">
+          „Eine kommunale Maßnahme erkennst du daran, dass die Stadt sie alleine umsetzen könnte –
+          ohne dass Berlin oder Brüssel etwas dagegen unternehmen kann."
+        </p>
+      </div>
+    `,
+  },
+  // Library 2: Bundesebene
+  {
+    id: 2,
+    location: 'Berlin · Bundestags-Archiv',
+    name: 'Bibliothek des Bundes',
+    target: 'Raum 02 · Das Kabinett',
+    intro: 'Die deutsche Klimapolitik wird im Kern durch vier Bundesgesetze gesteuert. Du wirst sie gleich zuordnen können müssen.',
+    content: `
+      <div class="lib-section">
+        <div class="lib-section-title">Vier Gesetze – vier Hebel</div>
+        <p>
+          Klimapolitik auf Bundesebene besteht aus einem Bündel von Gesetzen. Vier davon solltest du kennen,
+          weil sie typische Hebel der Umweltpolitik abbilden: <em>Ziele setzen, Preise lenken, Pflichten festlegen, Emissionen begrenzen.</em>
+        </p>
+        <table class="lib-table">
+          <thead>
+            <tr><th>Gesetz</th><th>Was es macht</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>KSG<br><span style="font-family:var(--font-body); font-weight:400; font-size:11px; color:var(--c-text-mute); letter-spacing:0;">Klimaschutz-<br>gesetz</span></td>
+              <td>Legt <strong>sektorale CO₂-Reduktionsziele</strong> fest – wieviel muss Verkehr, Gebäude, Industrie etc. einsparen? Zielmarke: Klimaneutralität bis <strong>2045</strong>.</td>
+            </tr>
+            <tr>
+              <td>BEHG<br><span style="font-family:var(--font-body); font-weight:400; font-size:11px; color:var(--c-text-mute); letter-spacing:0;">Brennstoff-<br>emissions-<br>handelsgesetz</span></td>
+              <td>Erhebt einen <strong>nationalen CO₂-Preis</strong> auf fossile Brennstoffe wie Heizöl, Erdgas, Benzin, Diesel. Macht <strong>Heizen und Tanken</strong> teurer.</td>
+            </tr>
+            <tr>
+              <td>GEG<br><span style="font-family:var(--font-body); font-weight:400; font-size:11px; color:var(--c-text-mute); letter-spacing:0;">Gebäude-<br>energiegesetz</span></td>
+              <td>Regelt den <strong>Heizungstausch und die Gebäudesanierung</strong>. Wann muss eine alte Gasheizung raus? Welche Dämmstandards gelten?</td>
+            </tr>
+            <tr>
+              <td>BImSchG<br><span style="font-family:var(--font-body); font-weight:400; font-size:11px; color:var(--c-text-mute); letter-spacing:0;">Bundes-<br>immissions-<br>schutzgesetz</span></td>
+              <td>Schützt vor <strong>Luftschadstoffen, Lärm und Geruch</strong>. Genehmigt <strong>Industrieanlagen</strong> und legt Grenzwerte für Emissionen aller Art fest.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lib-section">
+        <div class="lib-section-title">Eselsbrücke</div>
+        <ul class="lib-bullets">
+          <li><strong>KSG</strong> = <em>Ziele</em>. Wo wollen wir hin? Sektor für Sektor.</li>
+          <li><strong>BEHG</strong> = <em>Preise</em>. Was kostet eine Tonne CO₂ beim Tanken/Heizen?</li>
+          <li><strong>GEG</strong> = <em>Gebäude</em>. Wann tauschst du deine Heizung?</li>
+          <li><strong>BImSchG</strong> = <em>Anlagen</em>. Wieviel Dreck darf ein Industrieschornstein ausstoßen?</li>
+        </ul>
+      </div>
+    `,
+  },
+  // Library 3: EU-Ebene
+  {
+    id: 3,
+    location: 'Brüssel · Bibliothek des Rates',
+    name: 'Bibliothek der EU',
+    target: 'Raum 03 · Der Ratssaal',
+    intro: 'Was darf die EU – und was bleibt in nationaler Hand? Das nennt man Subsidiarität.',
+    content: `
+      <div class="lib-section">
+        <div class="lib-section-title">Das Subsidiaritätsprinzip</div>
+        <p>
+          Die EU darf <strong>nicht alles</strong>. Sie wird nur tätig, wenn ein Ziel <em>nicht ausreichend</em> auf nationaler Ebene
+          erreicht werden kann – und wenn die EU dadurch <em>besser</em> wirken kann (Art. 5 EUV).
+          Das ist das <strong>Subsidiaritätsprinzip</strong>: So lokal wie möglich, so weit oben wie nötig.
+        </p>
+      </div>
+
+      <div class="lib-section">
+        <div class="lib-section-title">Wo entscheidet die EU?</div>
+        <p>Vor allem dort, wo nationale Alleingänge nicht funktionieren würden – weil Wirtschaft, Verkehr und Umwelt grenzüberschreitend sind:</p>
+        <div class="lib-grid">
+          <div class="lib-card teal">
+            <div class="lib-card-sub">Binnenmarkt</div>
+            <div class="lib-card-title">Produktnormen</div>
+            <div class="lib-card-body">CO₂-Grenzwerte für Pkw, Energieeffizienz-Klassen, Plastikrichtlinien – einheitlich für alle 27 Staaten.</div>
+          </div>
+          <div class="lib-card teal">
+            <div class="lib-card-sub">Klima &amp; Markt</div>
+            <div class="lib-card-title">Emissionshandel</div>
+            <div class="lib-card-body">EU-ETS 1 und 2: ein gemeinsamer Markt für CO₂-Zertifikate macht nur EU-weit Sinn.</div>
+          </div>
+          <div class="lib-card teal">
+            <div class="lib-card-sub">Außenhandel</div>
+            <div class="lib-card-title">CBAM (Klimazoll)</div>
+            <div class="lib-card-body">Klimazoll an der EU-Außengrenze: ausschließliche EU-Kompetenz, weil Außenhandel exklusiv EU-Sache ist.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lib-section">
+        <div class="lib-section-title">Wo bleiben die Mitgliedstaaten zuständig?</div>
+        <p>Drei wichtige Felder gehören weiterhin Berlin, Paris, Rom usw. – auch wenn die EU sie thematisch beobachtet:</p>
+        <div class="lib-grid">
+          <div class="lib-card muted">
+            <div class="lib-card-sub">Souveränität</div>
+            <div class="lib-card-title">Energiemix</div>
+            <div class="lib-card-body">Welche Kraftwerke ein Land baut (Atom, Kohle, Gas, Wind) entscheidet jedes Land selbst (Art. 194 AEUV).</div>
+          </div>
+          <div class="lib-card muted">
+            <div class="lib-card-sub">Steuerhoheit</div>
+            <div class="lib-card-title">Steuersätze</div>
+            <div class="lib-card-body">Höhe der Mehrwertsteuer, Energiesteuer, Einkommensteuer – nationale Entscheidung (EU setzt nur Mindeststandards).</div>
+          </div>
+          <div class="lib-card muted">
+            <div class="lib-card-sub">Raum &amp; Bau</div>
+            <div class="lib-card-title">Genehmigung vor Ort</div>
+            <div class="lib-card-body">Wo darf ein Windrad stehen? Wo eine Photovoltaik-Anlage? Das regeln Länder und Kommunen.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="lib-section">
+        <div class="lib-section-title">Faustregel für den nächsten Raum</div>
+        <p style="font-family:var(--font-display); font-style:italic; font-size:17px; color:var(--c-gold);">
+          „Beim <em>Binnenmarkt</em> und <em>Außenhandel</em> hat die EU das letzte Wort. Bei <em>Steuern</em> und beim <em>Energiemix</em> bleibt es bei den Mitgliedstaaten."
+        </p>
+      </div>
+    `,
+  },
+  // Library 4: Globale Ebene
+  {
+    id: 4,
+    location: 'New York · UN-Bibliothek',
+    name: 'Bibliothek der globalen Ebene',
+    target: 'Raum 04 · Die Vollversammlung',
+    intro: 'Das Klima kennt keine Grenzen. Deshalb gibt es eine eigene globale Ebene – mit eigenen Eckdaten, die du gleich abrufen musst.',
+    content: `
+      <div class="lib-section">
+        <div class="lib-section-title">Das Pariser Abkommen</div>
+        <p>
+          Auf der Weltklimakonferenz <strong>COP 21 in Paris</strong> verabschiedeten 195 Staaten
+          das erste verbindliche globale Klimaabkommen. Es trat 2016 in Kraft.
+          <em>Recherchiere selbst, in welchem Jahr diese Konferenz stattfand und warum sie COP 21 genannt wird.</em>
+        </p>
+        <table class="lib-table">
+          <thead>
+            <tr><th>Eckdatum</th><th>Wert</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Jahr der Verabschiedung</td><td><strong>2015</strong></td></tr>
+            <tr><td>Temperaturziel (anzustreben)</td><td><strong>1,5 °C</strong> Erwärmung (statt 2 °C)</td></tr>
+            <tr><td>NDC</td><td><strong>N</strong>ationally <strong>D</strong>etermined <strong>Contributions</strong> – Klimabeiträge, die jedes Land selbst festlegt</td></tr>
+            <tr><td>EU-Klimaneutralitätsziel</td><td><strong>2050</strong></td></tr>
+            <tr><td>EU-Reduktionsziel bis 2030</td><td><strong>55 %</strong> weniger Treibhausgase als 1990</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lib-section">
+        <div class="lib-section-title">Wie funktioniert das?</div>
+        <ul class="lib-bullets">
+          <li><strong>COP</strong> = "Conference of the Parties" – jährliche Vertragsstaatenkonferenz der Klimarahmenkonvention (UNFCCC).</li>
+          <li>Jedes Land legt seine eigenen Klimaziele fest (<strong>NDC</strong>), muss diese aber alle 5 Jahre erhöhen.</li>
+          <li>Globale Themen wie <strong>Ozonschicht-Schutz</strong> (Montrealer Protokoll) und <strong>internationaler Flugverkehr</strong> (ICAO-CORSIA) werden ebenfalls auf UN-Ebene geregelt.</li>
+        </ul>
+      </div>
+    `,
+  },
+  // Library 5: Nachhaltigkeitsdimensionen
+  {
+    id: 5,
+    location: 'Brüssel · Strategiebibliothek',
+    name: 'Bibliothek der vier Säulen',
+    target: 'Raum 05 · Die Vier Säulen',
+    intro: 'Es gibt nicht nur einen Weg zur Nachhaltigkeit. Wissenschaftler:innen unterscheiden vier strategische Säulen.',
+    content: `
+      <div class="lib-section">
+        <div class="lib-section-title">Vier Dimensionen nachhaltigen Wirtschaftens</div>
+        <p>
+          Wer Klimaschutz nur als „bessere Technik" denkt, übersieht drei weitere Hebel. Die Nachhaltigkeitsforschung
+          unterscheidet vier komplementäre Strategien:
+        </p>
+        <div class="lib-svg-frame">
+          <svg viewBox="0 0 700 220" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, sans-serif;">
+            <defs>
+              <linearGradient id="grad-eff" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#2fb8a0" stop-opacity="0.9"/>
+                <stop offset="100%" stop-color="#1a6e62" stop-opacity="0.5"/>
+              </linearGradient>
+              <linearGradient id="grad-suf" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#d4af37" stop-opacity="0.9"/>
+                <stop offset="100%" stop-color="#8a7220" stop-opacity="0.5"/>
+              </linearGradient>
+              <linearGradient id="grad-kon" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#4f8edb" stop-opacity="0.9"/>
+                <stop offset="100%" stop-color="#2a5896" stop-opacity="0.5"/>
+              </linearGradient>
+              <linearGradient id="grad-par" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#e07856" stop-opacity="0.9"/>
+                <stop offset="100%" stop-color="#9b3d3d" stop-opacity="0.5"/>
+              </linearGradient>
+            </defs>
+
+            <!-- 4 pillars -->
+            <g>
+              <rect x="40" y="40" width="130" height="150" rx="2" fill="url(#grad-eff)" stroke="#2fb8a0" stroke-width="1"/>
+              <text x="105" y="80" text-anchor="middle" fill="#f4efe6" font-size="16" font-weight="700">Effizienz</text>
+              <text x="105" y="110" text-anchor="middle" fill="#f4efe6" font-size="11" font-style="italic">Gleicher Nutzen,</text>
+              <text x="105" y="125" text-anchor="middle" fill="#f4efe6" font-size="11" font-style="italic">weniger Ressourcen</text>
+              <text x="105" y="160" text-anchor="middle" fill="#f4efe6" font-size="10" opacity="0.85">E-Auto · LED</text>
+              <text x="105" y="174" text-anchor="middle" fill="#f4efe6" font-size="10" opacity="0.85">Wärmepumpe</text>
+            </g>
+            <g>
+              <rect x="200" y="40" width="130" height="150" rx="2" fill="url(#grad-suf)" stroke="#d4af37" stroke-width="1"/>
+              <text x="265" y="80" text-anchor="middle" fill="#f4efe6" font-size="16" font-weight="700">Suffizienz</text>
+              <text x="265" y="110" text-anchor="middle" fill="#f4efe6" font-size="11" font-style="italic">Bewusst</text>
+              <text x="265" y="125" text-anchor="middle" fill="#f4efe6" font-size="11" font-style="italic">weniger nutzen</text>
+              <text x="265" y="160" text-anchor="middle" fill="#f4efe6" font-size="10" opacity="0.85">Weniger fliegen</text>
+              <text x="265" y="174" text-anchor="middle" fill="#f4efe6" font-size="10" opacity="0.85">Sharing · Tempo 130</text>
+            </g>
+            <g>
+              <rect x="360" y="40" width="130" height="150" rx="2" fill="url(#grad-kon)" stroke="#4f8edb" stroke-width="1"/>
+              <text x="425" y="80" text-anchor="middle" fill="#f4efe6" font-size="16" font-weight="700">Konsistenz</text>
+              <text x="425" y="110" text-anchor="middle" fill="#f4efe6" font-size="11" font-style="italic">Im Stoffkreislauf</text>
+              <text x="425" y="125" text-anchor="middle" fill="#f4efe6" font-size="11" font-style="italic">der Natur bleiben</text>
+              <text x="425" y="160" text-anchor="middle" fill="#f4efe6" font-size="10" opacity="0.85">Solarstrom · Holzbau</text>
+              <text x="425" y="174" text-anchor="middle" fill="#f4efe6" font-size="10" opacity="0.85">Recycling-Beton</text>
+            </g>
+            <g>
+              <rect x="520" y="40" width="130" height="150" rx="2" fill="url(#grad-par)" stroke="#e07856" stroke-width="1"/>
+              <text x="585" y="80" text-anchor="middle" fill="#f4efe6" font-size="16" font-weight="700">Partizipation</text>
+              <text x="585" y="110" text-anchor="middle" fill="#f4efe6" font-size="11" font-style="italic">Bürger:innen</text>
+              <text x="585" y="125" text-anchor="middle" fill="#f4efe6" font-size="11" font-style="italic">mitgestalten lassen</text>
+              <text x="585" y="160" text-anchor="middle" fill="#f4efe6" font-size="10" opacity="0.85">Klimabürgerrat</text>
+              <text x="585" y="174" text-anchor="middle" fill="#f4efe6" font-size="10" opacity="0.85">Genossenschaft</text>
+            </g>
+
+            <text x="350" y="20" text-anchor="middle" fill="#d4af37" font-size="11" font-weight="700" letter-spacing="3" text-rendering="geometricPrecision">VIER SÄULEN NACHHALTIGEN WIRTSCHAFTENS</text>
+          </svg>
+        </div>
+      </div>
+
+      <div class="lib-section">
+        <div class="lib-section-title">Wie unterscheidet man sie?</div>
+        <ul class="lib-bullets">
+          <li><strong>Effizienz</strong> fragt: <em>"Kann ich dasselbe mit weniger Aufwand schaffen?"</em> (z. B. weniger Strom für gleiches Licht)</li>
+          <li><strong>Suffizienz</strong> fragt: <em>"Brauche ich das überhaupt – oder geht es auch mit weniger?"</em> (z. B. nicht fliegen)</li>
+          <li><strong>Konsistenz</strong> fragt: <em>"Verwende ich Stoffe, die in den Naturkreislauf passen?"</em> (z. B. Solar statt Kohle)</li>
+          <li><strong>Partizipation</strong> fragt: <em>"Wer entscheidet mit? Wessen Stimme zählt?"</em> (z. B. Bürgerräte)</li>
+        </ul>
+      </div>
+
+      <div class="lib-section">
+        <div class="lib-section-title">Wichtiger Hinweis</div>
+        <p>
+          Die vier Säulen ergänzen sich – sie sind keine Alternativen. Eine gute Klimapolitik nutzt alle vier.
+          Im nächsten Raum sollst du <em>12 Maßnahmen</em> auf die vier Säulen sortieren.
+        </p>
+      </div>
+    `,
+  },
+  // Library 6: Subsidiarität / Synthese
+  {
+    id: 6,
+    location: 'Brüssel · Studierzimmer',
+    name: 'Bibliothek der Synthese',
+    target: 'Raum 06 · Die Synthese',
+    intro: 'Letzte Bibliothek. Hier verknüpfst du alles: Wenn ein Klimaproblem auftaucht – wer ist zuständig?',
+    content: `
+      <div class="lib-section">
+        <div class="lib-section-title">Subsidiarität als Entscheidungsregel</div>
+        <p>
+          Du kennst jetzt vier Ebenen: <strong>Kommune – Bund – EU – Global</strong>.
+          Für die meisten realen Klimaprobleme gibt es eine "natürlich passende" Ebene.
+          Die Regel ist immer dieselbe: <strong>So lokal wie möglich, so weit oben wie nötig.</strong>
+        </p>
+      </div>
+
+      <div class="lib-section">
+        <div class="lib-section-title">Die richtige Ebene erkennen</div>
+        <p>Frag dich bei jedem Problem: <em>Wo enden die Folgen?</em></p>
+        <div class="lib-svg-frame">
+          <svg viewBox="0 0 680 280" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, sans-serif;">
+            <!-- Pyramid -->
+            <g>
+              <!-- Global (top) -->
+              <polygon points="340,20 240,75 440,75" fill="rgba(212,175,55,0.18)" stroke="#d4af37" stroke-width="1.5"/>
+              <text x="340" y="55" text-anchor="middle" fill="#d4af37" font-size="15" font-weight="700">GLOBAL / UN</text>
+              <text x="340" y="68" text-anchor="middle" fill="#a8b3c7" font-size="10" font-style="italic">grenzüberschreitend</text>
+
+              <!-- EU -->
+              <polygon points="240,75 440,75 480,130 200,130" fill="rgba(79,142,219,0.18)" stroke="#4f8edb" stroke-width="1.5"/>
+              <text x="340" y="105" text-anchor="middle" fill="#4f8edb" font-size="15" font-weight="700">EU</text>
+              <text x="340" y="121" text-anchor="middle" fill="#a8b3c7" font-size="10" font-style="italic">Binnenmarkt, Außenhandel, Emissionshandel</text>
+
+              <!-- Bund -->
+              <polygon points="200,130 480,130 520,185 160,185" fill="rgba(47,184,160,0.18)" stroke="#2fb8a0" stroke-width="1.5"/>
+              <text x="340" y="160" text-anchor="middle" fill="#2fb8a0" font-size="15" font-weight="700">BUND</text>
+              <text x="340" y="176" text-anchor="middle" fill="#a8b3c7" font-size="10" font-style="italic">KSG, BEHG, GEG, BImSchG · Sektorziele &amp; nationale Regeln</text>
+
+              <!-- Kommune -->
+              <polygon points="160,185 520,185 560,250 120,250" fill="rgba(224,120,86,0.18)" stroke="#e07856" stroke-width="1.5"/>
+              <text x="340" y="215" text-anchor="middle" fill="#e07856" font-size="15" font-weight="700">KOMMUNE</text>
+              <text x="340" y="231" text-anchor="middle" fill="#a8b3c7" font-size="10" font-style="italic">Wärmeplanung, Radwege, Bauleitplanung, eigene Gebäude</text>
+
+              <!-- Arrow guidance -->
+              <text x="35" y="50" fill="#a8b3c7" font-size="10" font-style="italic">grenzüberschreitend?</text>
+              <text x="35" y="65" fill="#a8b3c7" font-size="10" font-style="italic">→ höher gehen</text>
+
+              <text x="600" y="240" fill="#a8b3c7" font-size="10" font-style="italic" text-anchor="end">nur lokal?</text>
+              <text x="600" y="255" fill="#a8b3c7" font-size="10" font-style="italic" text-anchor="end">→ unten bleiben</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <div class="lib-section">
+        <div class="lib-section-title">Beispiele zum Mitlesen</div>
+        <table class="lib-table">
+          <thead>
+            <tr><th>Problem</th><th>Ebene</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>FCKW-Verbot (Ozonschicht)</td><td><strong style="color:var(--c-gold)">Global</strong> – betrifft alle Länder</td></tr>
+            <tr><td>Internationaler Flugverkehr</td><td><strong style="color:var(--c-gold)">Global</strong> – grenzüberschreitend</td></tr>
+            <tr><td>CO₂-Grenzwerte für neue Pkw in Europa</td><td><strong style="color:var(--c-gold)">EU</strong> – Binnenmarkt</td></tr>
+            <tr><td>Heizungstausch-Pflicht im Bundesgebiet</td><td><strong style="color:var(--c-gold)">Bund</strong> – GEG</td></tr>
+            <tr><td>Sektorale Klimaziele für Verkehr und Industrie</td><td><strong style="color:var(--c-gold)">Bund</strong> – KSG</td></tr>
+            <tr><td>Begrünung des Marktplatzes</td><td><strong style="color:var(--c-gold)">Kommune</strong> – Stadtplanung</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="lib-section">
+        <div class="lib-section-title">Letzter Merksatz</div>
+        <p style="font-family:var(--font-display); font-style:italic; font-size:17px; color:var(--c-gold);">
+          „Endet das Problem an der Stadtgrenze? Kommune. An der Bundesgrenze? Bund. An der EU-Grenze? EU. Sonst: Global."
+        </p>
+      </div>
+    `,
+  },
+];
+
+function renderLibrary(idx) {
+  if (idx === 1) { renderLibrary2Video(); return; }
+  if (idx === 3) { renderLibrary4Video(); return; }
+  state.screen = 'lib' + (idx + 1);
+  renderSeals();
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  const lib = LIBRARIES[idx];
+  root.innerHTML = `
+    <div class="library-banner">
+      <svg class="library-banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        <line x1="9" y1="7" x2="17" y2="7"/>
+        <line x1="9" y1="11" x2="17" y2="11"/>
+      </svg>
+      <div class="library-banner-text">
+        Dies ist ein <strong>Bibliotheksraum</strong>. Hier findest du das Wissen, das du im folgenden Rätsel brauchen wirst.
+        <span class="warn">⚠ Wichtig: Wenn du gleich den Rätselraum betrittst, kannst du nicht mehr in die Bibliothek zurück. Mach dir Notizen!</span>
+      </div>
+    </div>
+
+    <div class="room-header">
+      <div class="room-number" style="color: var(--c-teal);">B${idx + 1}</div>
+      <div class="room-meta">
+        <div class="room-location">${lib.location}</div>
+        <div class="room-name">${lib.name}</div>
+      </div>
+    </div>
+
+    <p class="lede" style="margin-bottom: 28px;">${lib.intro}</p>
+
+    ${lib.content}
+
+    <div class="lib-warning-bar">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <div class="text">
+        Hast du dir alles aufgeschrieben? <strong>Sobald du den Rätselraum betrittst, gibt es keinen Weg zurück.</strong>
+      </div>
+    </div>
+
+    <div class="btn-row">
+      <button class="btn btn-primary btn-arrow" onclick="goRoom(${idx + 1})">Zum Rätsel: ${lib.target}</button>
+    </div>
+  `;
+}
+
+window.goLibrary = (n) => {
+  // n is 1-indexed
+  renderLibrary(n - 1);
+};
+
+/* ============================================================
+   VIDEO-BIBLIOTHEKEN (2 & 4) + TEXTFASSUNGEN
+   ============================================================ */
+
+function libBannerHTML() {
+  return `
+    <div class="library-banner">
+      <svg class="library-banner-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+        <line x1="9" y1="7" x2="17" y2="7"/>
+        <line x1="9" y1="11" x2="17" y2="11"/>
+      </svg>
+      <div class="library-banner-text">
+        Dies ist ein <strong>Bibliotheksraum</strong>. Hier findest du das Wissen, das du im folgenden Rätsel brauchen wirst.
+        <span class="warn">⚠ Wichtig: Wenn du gleich den Rätselraum betrittst, kannst du nicht mehr in die Bibliothek zurück. Mach dir Notizen!</span>
+      </div>
+    </div>`;
+}
+function libWarningHTML() {
+  return `
+    <div class="lib-warning-bar">
+      <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <div class="text">
+        Hast du dir alles aufgeschrieben? <strong>Sobald du den Rätselraum betrittst, gibt es keinen Weg zurück.</strong>
+      </div>
+    </div>`;
+}
+
+/* ---- Textfassung zu Bibliothek 2: Die Hebel der Umweltpolitik ---- */
+const LIB2_TEXT = `
+  <div class="lib-section">
+    <div class="lib-section-title">Warum überhaupt Umweltpolitik?</div>
+    <p>Wer Kohle verfeuert oder mit dem Verbrenner fährt, verursacht Schäden – etwa durch Treibhausgase –, für die er selbst zunächst nicht zahlt; die Kosten trägt die Allgemeinheit. Solche nicht eingepreisten Folgen nennt man <strong>externe Effekte</strong> (externe Kosten). Der Markt allein bildet sie im Preis nicht ab. Aufgabe des Staates ist es deshalb, diese Kosten den Verursachern wieder zuzurechnen – die <strong>Internalisierung externer Kosten</strong>. Dahinter steht das <strong>Verursacherprinzip</strong>: Wer die Umwelt belastet, soll dafür aufkommen.</p>
+  </div>
+
+  <div class="lib-section">
+    <div class="lib-section-title">Vier typische Hebel des Bundes</div>
+    <p>Wie der Bund steuert, lässt sich in vier Instrumentengruppen ordnen:</p>
+    <table class="lib-table">
+      <thead><tr><th>Hebel</th><th>Wirkungsweise</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Ordnungsrecht</strong></td><td>schreibt Verhalten vor (Ge-/Verbote, Grenzwerte, Standards)</td></tr>
+        <tr><td><strong>Ökonomische Instrumente</strong></td><td>setzen finanzielle Anreize (Preis- oder Mengenlösung)</td></tr>
+        <tr><td><strong>Förderung</strong></td><td>belohnt erwünschtes Verhalten (Zuschüsse, Programme)</td></tr>
+        <tr><td><strong>Information</strong></td><td>beeinflusst über Aufklärung und Kennzeichnung</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="lib-section">
+    <div class="lib-section-title">1 · Ordnungsrechtliche Instrumente (Auflagenlösung)</div>
+    <p>Der Staat steuert über <strong>Ge- und Verbote, Grenzwerte und Standards</strong>, also durch rechtlichen Zwang. Beispiele: das <strong>BImSchG</strong> legt Grenzwerte für den Schadstoffausstoß von Anlagen fest und regelt deren Genehmigung; das <strong>GEG</strong> schreibt Heizungstausch und Dämmstandards vor. Vorteil: hohe Planungssicherheit und klare ökologische Wirkung. Nachteil: unflexibel und oft ineffizient, weil alle dasselbe tun müssen – unabhängig davon, wer Emissionen am günstigsten vermeiden könnte; zudem hoher Kontrollaufwand.</p>
+  </div>
+
+  <div class="lib-section">
+    <div class="lib-section-title">2 · Marktwirtschaftliche (ökonomische) Instrumente</div>
+    <p>Sie schreiben kein konkretes Verhalten vor, sondern setzen <strong>finanzielle Anreize</strong> und überlassen die Entscheidung dem Einzelnen. Zwei Varianten:</p>
+    <ul class="lib-bullets">
+      <li><strong>Preislösung (Abgaben/Steuern):</strong> Der Staat legt einen <strong>Preis</strong> fest – die Menge ergibt sich daraus. Wichtigstes Beispiel: das <strong>BEHG</strong> mit seinem nationalen CO₂-Preis auf fossile Brennstoffe. Eine solche Lenkungsabgabe verteuert klimaschädliches Verhalten. Der Preis ist klar, die genau eingesparte Menge bleibt offen.</li>
+      <li><strong>Mengenlösung (Zertifikatehandel, „Cap-and-Trade"):</strong> Der Staat legt eine <strong>Höchstmenge</strong> fest (den „Cap") und gibt handelbare Zertifikate aus – der Preis bildet sich am Markt. Vor allem auf EU-Ebene im Einsatz (EU-Emissionshandel): ökologisch treffsicher bei der Menge, dafür ist der Preis weniger vorhersehbar.</li>
+    </ul>
+    <p>Gemeinsamer Vorteil: <strong>ökonomische Effizienz</strong> – Emissionen werden dort eingespart, wo es am billigsten ist. Kritisch ist die <strong>Verteilungswirkung</strong>: Ein CO₂-Preis belastet einkommensschwache Haushalte relativ stärker, was die gesellschaftliche Akzeptanz beeinflusst.</p>
+  </div>
+
+  <div class="lib-section">
+    <div class="lib-section-title">3 · Finanzielle Förderung (Anreiz-/Subventionsinstrumente)</div>
+    <p>Statt zu verteuern oder zu verbieten, <strong>belohnt</strong> der Staat erwünschtes Verhalten durch Zuschüsse und Förderprogramme – etwa für den Einbau einer Wärmepumpe oder die Gebäudesanierung. Das erhöht die Akzeptanz und beschleunigt den Umstieg, kostet aber Steuergeld und folgt eher dem <strong>Gemeinlastprinzip</strong> (die Allgemeinheit zahlt) als dem Verursacherprinzip.</p>
+  </div>
+
+  <div class="lib-section">
+    <div class="lib-section-title">4 · Information und Selbstverpflichtung (persuasive Instrumente)</div>
+    <p>Die „weichsten" Hebel wirken über Aufklärung, Kennzeichnung (z. B. das Energielabel) oder freiwillige Vereinbarungen mit der Wirtschaft. Sie setzen weder Zwang noch starke finanzielle Anreize, sondern auf Einsicht und Transparenz – wirksam, für sich genommen aber meist zu schwach.</p>
+  </div>
+
+  <div class="lib-section">
+    <div class="lib-section-title">Die übergeordnete Klammer: Zielvorgaben (KSG)</div>
+    <p>Über all diesen Instrumenten steht das <strong>KSG</strong>, das <strong>sektorale Reduktionsziele</strong> und das Datum der Klimaneutralität (<strong>2045</strong>) verbindlich festlegt. Es ist selbst kein „Verhaltenshebel", sondern gibt die Richtung vor: Erst stehen die Ziele, dann wählt der Bund die passende Mischung aus Auflagen, Preisen, Förderung und Information.</p>
+  </div>
+
+  <div class="lib-section">
+    <div class="lib-section-title">Worin unterscheiden sich die Hebel?</div>
+    <p>Die Leitfrage lautet: <em>Wird Verhalten vorgeschrieben (Ordnungsrecht), verteuert (Preislösung), gedeckelt (Mengenlösung), belohnt (Förderung) oder nur beeinflusst (Information)?</em> In der Praxis kombiniert der Bund die Instrumente bewusst zu einem <strong>Policy-Mix</strong>, weil jedes Schwächen hat: Auflagen sind treffsicher, aber starr; Preise sind effizient, aber sozial heikel; Förderung schafft Akzeptanz, kostet aber Geld. Erst das Zusammenspiel macht die Klimapolitik wirksam.</p>
+  </div>
+
+  <div class="lib-section">
+    <div class="lib-section-title">Zur Einordnung</div>
+    <ul class="lib-bullets">
+      <li>Das <strong>BEHG</strong> ist genau genommen ein Mischinstrument (ein Zertifikatesystem mit anfänglicher Festpreisphase). Für den Überblick wird es hier als <strong>CO₂-Bepreisung / Preisinstrument</strong> eingeordnet; der Zertifikate-Mechanismus wird bewusst dem EU-Emissionshandel als Kontrast gegenübergestellt.</li>
+      <li>Die Vierer-Typologie (Ordnungsrecht – ökonomische Instrumente – Förderung – Information) ist in PoWi-Lehrwerken üblich; die Zielvorgabe (KSG) wird je nach Darstellung separat geführt oder den planerischen Instrumenten zugeordnet.</li>
+    </ul>
+  </div>
+`;
+
+/* ---- Textfassung zu Bibliothek 4: Pariser Abkommen & 1,5-Grad-Ziel ---- */
+const LIB4_TEXT = `
+  <div class="lib-section">
+    <div class="lib-section-title">Das Pariser Abkommen & das 1,5-Grad-Ziel</div>
+    <p><strong>Historischer Beschluss:</strong> Im Jahr <strong>2015</strong> unterzeichneten alle Länder der Erde in Paris ein Abkommen, um die Erderwärmung auf deutlich unter zwei Grad, idealerweise auf <strong>1,5 Grad</strong>, zu begrenzen. Als Vergleichsbasis dient die weltweite Durchschnittstemperatur vor Beginn der Industrialisierung, seit der die Temperatur bereits um etwa <strong>1,2 Grad</strong> gestiegen ist.</p>
+    <p><strong>Relevanz des Ziels:</strong> Ein halbes Grad Unterschied hat massive globale Auswirkungen. Ein konsequenter Klimaschutz zur Einhaltung des 1,5-Grad-Ziels verursacht geringere Schäden und Kosten als die Folgen einer Erwärmung um zwei Grad oder mehr.</p>
+  </div>
+
+  <div class="lib-section">
+    <div class="lib-section-title">Die Gefahr von Kipppunkten</div>
+    <p><strong>Unumkehrbare Prozesse:</strong> Ab einer Erwärmung um zwei Grad drohen sogenannte <strong>Kipppunkte</strong> im Klimasystem. Einmal angestoßen, verändern sich Umweltzustände abrupt und unumkehrbar.</p>
+    <p><strong>Dominoeffekt:</strong> Ein Beispiel ist das Auftauen der jahrtausendelang gefrorenen <strong>Permafrostböden</strong> in Sibirien und Kanada. Bakterien zersetzen dort die auftauende Biomasse, wodurch riesige Mengen an Treibhausgasen frei werden. Dies kann einen unaufhaltsamen Dominoeffekt im Klimasystem auslösen.</p>
+  </div>
+
+  <div class="lib-section">
+    <div class="lib-section-title">Das Restbudget und der Weg zur Klimaneutralität</div>
+    <p><strong>Das CO₂-Budget:</strong> Die Wissenschaft berechnet ein verbleibendes <strong>Restbudget</strong> an Treibhausgasen, das maximal noch ausgestoßen werden darf. Ist dieses aufgebraucht, muss zwingend <strong>Klimaneutralität</strong> herrschen.</p>
+    <p><strong>Klimaneutralität:</strong> Das bedeutet, dass nur noch so viele Treibhausgase emittiert werden dürfen, wie die Natur (z. B. durch Bäume) wieder aufnehmen kann. Technische Maßnahmen zur nachträglichen CO₂-Entnahme aus der Atmosphäre gelten als sehr teuer, aufwendig und riskant.</p>
+    <p><strong>Handlungsbedarf für Deutschland:</strong> Ändert sich das Emissionsverhalten nicht, ist das Budget für Deutschland bereits in diesem Jahrzehnt erschöpft. Um das Pariser Abkommen einzuhalten, müssen die Emissionen in Deutschland vor 2030 drastisch sinken, und zwischen 2030 und 2040 muss die vollständige Klimaneutralität erreicht werden. Laut Wissenschaft ist dies mit großen Anstrengungen machbar.</p>
+  </div>
+`;
+
+/* ---- Bibliothek 2: Video ---- */
+function renderLibrary2Video() {
+  state.screen = 'lib2';
+  renderSeals();
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  const lib = LIBRARIES[1];
+  root.innerHTML = `
+    ${libBannerHTML()}
+    <div class="room-header">
+      <div class="room-number" style="color: var(--c-teal);">B2</div>
+      <div class="room-meta">
+        <div class="room-location">${lib.location}</div>
+        <div class="room-name">${lib.name}</div>
+      </div>
+    </div>
+    <p class="lede" style="margin-bottom: 22px;">Die deutsche Klimapolitik steuert über verschiedene „Hebel". Sieh dir dazu den folgenden Erklärfilm an.</p>
+
+    <div class="video-wrap">
+      <iframe src="https://www.youtube-nocookie.com/embed/CkAdmasablo?rel=0" title="Erklärfilm: Instrumente der Umweltpolitik des Bundes" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <div class="fallback-line">
+      <span>Video lädt nicht oder zeigt einen Fehler?</span>
+      <a class="btn btn-ghost" href="https://www.youtube.com/watch?v=CkAdmasablo" target="_blank" rel="noopener noreferrer">Direkt auf YouTube öffnen ↗</a>
+      <button class="btn btn-ghost" onclick="renderLibrary2Alt()">Text zum Thema statt Video</button>
+    </div>
+
+    ${libWarningHTML()}
+    <div class="btn-row">
+      <button class="btn btn-primary btn-arrow" onclick="goRoom(2)">Zum Rätsel: ${lib.target}</button>
+    </div>
+  `;
+}
+window.renderLibrary2Video = renderLibrary2Video;
+
+window.renderLibrary2Alt = () => {
+  state.screen = 'lib2alt';
+  renderSeals();
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  const lib = LIBRARIES[1];
+  root.innerHTML = `
+    ${libBannerHTML()}
+    <div class="room-header">
+      <div class="room-number" style="color: var(--c-teal);">B2</div>
+      <div class="room-meta">
+        <div class="room-location">${lib.location}</div>
+        <div class="room-name">Bibliothek des Bundes — Textfassung</div>
+      </div>
+    </div>
+    <div class="card" style="background: rgba(212,175,55,0.08); border-color: var(--c-border);">
+      <p style="margin:0; font-size:14px;">Dies ist die <strong>Textfassung</strong> zum Thema – als Alternative zum Erklärfilm. Von hier aus geht es ganz normal weiter zum Rätsel.</p>
+    </div>
+    <p class="lede" style="margin-bottom: 22px;">Die Hebel der Umweltpolitik – wie der Bund steuert.</p>
+    ${LIB2_TEXT}
+    ${libWarningHTML()}
+    <div class="btn-row">
+      <button class="btn btn-primary btn-arrow" onclick="goRoom(2)">Zum Rätsel: ${lib.target}</button>
+      <button class="btn btn-ghost" onclick="renderLibrary2Video()">Zurück zum Video</button>
+    </div>
+  `;
+};
+
+/* ---- Bibliothek 4: Video (bisheriger Text bleibt erhalten) ---- */
+function renderLibrary4Video() {
+  state.screen = 'lib4';
+  renderSeals();
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  const lib = LIBRARIES[3];
+  root.innerHTML = `
+    ${libBannerHTML()}
+    <div class="room-header">
+      <div class="room-number" style="color: var(--c-teal);">B4</div>
+      <div class="room-meta">
+        <div class="room-location">${lib.location}</div>
+        <div class="room-name">${lib.name}</div>
+      </div>
+    </div>
+    <p class="lede" style="margin-bottom: 22px;">Das Klima kennt keine Grenzen. Sieh dir zum Pariser Abkommen den folgenden Erklärfilm an – darunter findest du außerdem die Eckdaten als Text.</p>
+
+    <div class="video-wrap">
+      <iframe src="https://www.youtube-nocookie.com/embed/J5dF3O7s7JA?rel=0" title="Erklärfilm: Pariser Abkommen und 1,5-Grad-Ziel" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+    </div>
+    <div class="fallback-line">
+      <span>Video lädt nicht oder zeigt einen Fehler?</span>
+      <a class="btn btn-ghost" href="https://www.youtube.com/watch?v=J5dF3O7s7JA" target="_blank" rel="noopener noreferrer">Direkt auf YouTube öffnen ↗</a>
+      <button class="btn btn-ghost" onclick="renderLibrary4Alt()">Text zum Thema statt Video</button>
+    </div>
+
+    ${lib.content}
+
+    ${libWarningHTML()}
+    <div class="btn-row">
+      <button class="btn btn-primary btn-arrow" onclick="goRoom(4)">Zum Rätsel: ${lib.target}</button>
+    </div>
+  `;
+}
+window.renderLibrary4Video = renderLibrary4Video;
+
+window.renderLibrary4Alt = () => {
+  state.screen = 'lib4alt';
+  renderSeals();
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  const lib = LIBRARIES[3];
+  root.innerHTML = `
+    ${libBannerHTML()}
+    <div class="room-header">
+      <div class="room-number" style="color: var(--c-teal);">B4</div>
+      <div class="room-meta">
+        <div class="room-location">${lib.location}</div>
+        <div class="room-name">Bibliothek der globalen Ebene — Textfassung</div>
+      </div>
+    </div>
+    <div class="card" style="background: rgba(212,175,55,0.08); border-color: var(--c-border);">
+      <p style="margin:0; font-size:14px;">Dies ist die <strong>Textfassung</strong> zum Erklärfilm. Von hier aus geht es ganz normal weiter zum Rätsel.</p>
+    </div>
+    <p class="lede" style="margin-bottom: 22px;">Das Pariser Abkommen & das 1,5-Grad-Ziel.</p>
+    ${LIB4_TEXT}
+    ${libWarningHTML()}
+    <div class="btn-row">
+      <button class="btn btn-primary btn-arrow" onclick="goRoom(4)">Zum Rätsel: ${lib.target}</button>
+      <button class="btn btn-ghost" onclick="renderLibrary4Video()">Zurück zum Video</button>
+    </div>
+  `;
+};
+
+/* ============================================================
+   ROOMS
+   ============================================================ */
+
+let r1Selected = new Set();
+let r1Submitted = false;
+
+function renderRoom1() {
+  state.screen = 'room1';
+  renderSeals();
+  r1Selected = new Set();
+  r1Submitted = false;
+  const room = ROOMS[0];
+
+  const cards = PUZZLE_R1.measures.map(m => `
+    <button class="measure-card" id="card-${m.id}" onclick="toggleR1('${m.id}')">
+      <span class="checkbox"></span>
+      <span><span class="card-text">${m.text}</span><div class="feedback-hint" id="hint-${m.id}">${m.expl}</div></span>
+    </button>
+  `).join('');
+
+  root.innerHTML = `
+    ${roomHeader(room)}
+    <div class="measure-grid">${cards}</div>
+    ${roomFooter(room,
+      'Frage dich: Wer ist <strong>Eigentümer</strong> der Sache? Wer plant <strong>vor Ort</strong>? CO₂-Preise und EU-weit gültige Verbote werden NICHT in der Kommune beschlossen.',
+      'checkR1()')}
+  `;
+}
+
+window.toggleR1 = (id) => {
+  if (r1Submitted) return;
+  const card = document.getElementById('card-' + id);
+  if (r1Selected.has(id)) {
+    r1Selected.delete(id);
+    card.classList.remove('selected');
+  } else {
+    r1Selected.add(id);
+    card.classList.add('selected');
+  }
+};
+
+window.checkR1 = () => {
+  const correctSet = new Set(PUZZLE_R1.measures.filter(m => m.correct).map(m => m.id));
+  let perfectMatch = true;
+  const wrongSelected = [];
+  const missed = [];
+
+  // Mark each card with feedback
+  PUZZLE_R1.measures.forEach(m => {
+    const card = document.getElementById('card-' + m.id);
+    card.classList.remove('selected', 'feedback-correct', 'feedback-incorrect', 'feedback-missed');
+    const isSelected = r1Selected.has(m.id);
+    if (isSelected && m.correct) {
+      card.classList.add('feedback-correct');
+    } else if (isSelected && !m.correct) {
+      card.classList.add('feedback-incorrect');
+      perfectMatch = false;
+      wrongSelected.push(m);
+    } else if (!isSelected && m.correct) {
+      card.classList.add('feedback-missed');
+      perfectMatch = false;
+      missed.push(m);
+    }
+  });
+
+  // Record errors (first attempt only)
+  const errors = [];
+  wrongSelected.forEach(m => errors.push({ kind: 'falsch_gewaehlt', item: m.text, explanation: m.expl }));
+  missed.forEach(m => errors.push({ kind: 'uebersehen', item: m.text, explanation: m.expl }));
+  recordAttempt(0, { errors });
+
+  if (perfectMatch) {
+    r1Submitted = true;
+    showStatus('success', 'Raum gelöst', 'Vier kommunale Maßnahmen korrekt identifiziert. Die Bürgermeisterin nickt anerkennend.');
+    setTimeout(() => triggerReveal(0), 900);
+  } else {
+    showStatus('warning', 'Noch nicht ganz', 'Schau dir die rot markierten Karten (falsch gewählt) und die gold markierten Karten (übersehen) an. Lies die Erklärungen und korrigiere deine Auswahl.');
+    // Allow retry: reset visual state after a moment but keep selections
+    setTimeout(() => {
+      PUZZLE_R1.measures.forEach(m => {
+        const card = document.getElementById('card-' + m.id);
+        card.classList.remove('feedback-correct', 'feedback-incorrect', 'feedback-missed');
+        if (r1Selected.has(m.id)) card.classList.add('selected');
+      });
+    }, 5000);
+  }
+};
+
+/* ============================================================
+   ROOM 2: Matching (Bundesgesetze)
+   ============================================================ */
+
+let r2SelectedLeft = null;
+let r2Pairs = {};   // leftIdx -> rightId
+let r2Submitted = false;
+
+/* Teil 2: Dropdown-Lückentext zur Textseite „Text zum Thema statt Video" (Bibliothek 2) */
+const R2B_BANK = ['externe Kosten', 'Verursacherprinzip', 'Ordnungsrecht', 'Lenkungsabgabe', 'Mengenlösung', 'Policy-Mix', 'Gemeinlastprinzip', 'Deregulierung'];
+const R2B_BLANKS = [
+  { id: 'b1', correct: 'externe Kosten', label: 'Schäden, die auf die Allgemeinheit abgewälzt werden' },
+  { id: 'b2', correct: 'Verursacherprinzip', label: 'Grundsatz: Wer die Umwelt belastet, soll dafür aufkommen' },
+  { id: 'b3', correct: 'Ordnungsrecht', label: 'Steuerung über Grenzwerte und Verbote' },
+  { id: 'b4', correct: 'Lenkungsabgabe', label: 'CO₂-Preis als finanzieller Anreiz' },
+  { id: 'b5', correct: 'Mengenlösung', label: 'Höchstmenge festlegen, Preis bildet sich am Markt' },
+  { id: 'b6', correct: 'Policy-Mix', label: 'bewusste Kombination mehrerer Instrumente' },
+];
+
+function renderRoom2() {
+  state.screen = 'room2';
+  renderSeals();
+  r2SelectedLeft = null;
+  r2Pairs = {};
+  r2Submitted = false;
+  const room = ROOMS[1];
+
+  // Shuffle the right side
+  const rights = [...PUZZLE_R2.pairs].sort(() => Math.random() - 0.5);
+
+  const leftHtml = PUZZLE_R2.pairs.map((p, i) => `
+    <button class="match-card" id="left-${i}" onclick="selectLeft(${i})">
+      <span class="match-marker">${i + 1}</span>
+      <span><span class="match-strong">${p.left}</span><br><span style="font-size:11.5px; color:var(--c-text-mute);">${p.leftLong}</span></span>
+    </button>
+  `).join('');
+
+  const rightHtml = rights.map(r => `
+    <button class="match-card" id="right-${r.rightId}" onclick="selectRight('${r.rightId}')">
+      <span class="match-marker">?</span>
+      <span>${r.right}</span>
+    </button>
+  `).join('');
+
+  // Teil 2: Optionen nach Buchstabenmenge sortiert (keine Rückschlüsse aus der Reihenfolge)
+  const bank = R2B_BANK.slice().sort((a, b) => a.length - b.length || a.localeCompare(b, 'de'));
+  const sel = (id) => `<select class="cloze-select" id="r2b-${id}"><option value="">— wählen —</option>${bank.map(w => `<option value="${w}">${w}</option>`).join('')}</select>`;
+  const part2 = `
+    <div class="card" style="margin-top: 8px;">
+      <p class="body-lg" style="margin-bottom: 12px;"><strong>Teil 2 · Lückentext zur Textseite.</strong> Wähle für jede Lücke den passenden Begriff.</p>
+      <p class="cloze-prose">
+        Schäden, die ein Verursacher nicht selbst trägt, sondern auf die Allgemeinheit abwälzt, nennt man ${sel('b1')}.
+        Damit er für sie aufkommt, gilt das ${sel('b2')}.
+        Schreibt der Staat über Grenzwerte und Verbote konkretes Verhalten vor, spricht man vom ${sel('b3')}.
+        Verteuert er klimaschädliches Verhalten gezielt über einen CO₂-Preis, ist das eine ${sel('b4')}.
+        Legt er dagegen eine Höchstmenge fest und lässt den Preis am Markt entstehen, handelt es sich um die ${sel('b5')}.
+        Weil jedes Instrument Schwächen hat, kombiniert der Bund sie in der Praxis zu einem ${sel('b6')}.
+      </p>
+    </div>`;
+
+  root.innerHTML = `
+    ${roomHeader(room)}
+    <p class="body-lg" style="margin: 6px 0 4px;"><strong>Teil 1 · Gesetz und Wirkung.</strong> Klick auf ein Gesetz, dann auf die passende Wirkung.</p>
+    <div class="matching-board">
+      <div>
+        <div style="font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:var(--c-text-dim); margin-bottom:8px;">Gesetz</div>
+        ${leftHtml}
+      </div>
+      <div>
+        <div style="font-family:var(--font-mono); font-size:10px; font-weight:700; letter-spacing:0.2em; text-transform:uppercase; color:var(--c-text-dim); margin-bottom:8px;">Wirkung</div>
+        ${rightHtml}
+      </div>
+    </div>
+    ${part2}
+    ${roomFooter(room,
+      'Teil 1: KSG legt <em>Ziele</em> fest, BEHG legt <em>Preise</em> fest, GEG regelt <em>Heizungen und Sanierung</em>, BImSchG schützt vor <em>Emissionen</em> aller Art (Lärm, Staub, Geruch). — Teil 2: externe Kosten/Verursacherprinzip; Ordnungsrecht = Grenzwerte/Verbote; Lenkungsabgabe = CO₂-Preis; Mengenlösung = Cap mit Marktpreis; Policy-Mix = Kombination der Instrumente.',
+      'checkR2()')}
+  `;
+}
+
+window.selectLeft = (i) => {
+  if (r2Submitted) return;
+  // Already paired?
+  if (r2Pairs[i] !== undefined) {
+    // Unpair
+    const rightId = r2Pairs[i];
+    document.getElementById('right-' + rightId).classList.remove('paired');
+    document.getElementById('right-' + rightId).querySelector('.match-marker').textContent = '?';
+    document.getElementById('left-' + i).classList.remove('paired');
+    document.getElementById('left-' + i).querySelector('.match-marker').textContent = (i + 1);
+    delete r2Pairs[i];
+    return;
+  }
+  // Deselect others
+  document.querySelectorAll('#screenContainer .match-card.selected').forEach(c => {
+    if (c.id.startsWith('left-')) c.classList.remove('selected');
+  });
+  document.getElementById('left-' + i).classList.add('selected');
+  r2SelectedLeft = i;
+};
+
+window.selectRight = (rightId) => {
+  if (r2Submitted) return;
+  // If already paired, unpair
+  for (const [li, ri] of Object.entries(r2Pairs)) {
+    if (ri === rightId) {
+      document.getElementById('right-' + rightId).classList.remove('paired');
+      document.getElementById('right-' + rightId).querySelector('.match-marker').textContent = '?';
+      document.getElementById('left-' + li).classList.remove('paired');
+      document.getElementById('left-' + li).querySelector('.match-marker').textContent = (Number(li) + 1);
+      delete r2Pairs[li];
+      return;
+    }
+  }
+  if (r2SelectedLeft === null) {
+    showStatus('info', 'Tipp', 'Wähle zuerst ein Gesetz auf der linken Seite.');
+    return;
+  }
+  // Pair them
+  const leftIdx = r2SelectedLeft;
+  r2Pairs[leftIdx] = rightId;
+  document.getElementById('left-' + leftIdx).classList.remove('selected');
+  document.getElementById('left-' + leftIdx).classList.add('paired');
+  document.getElementById('right-' + rightId).classList.add('paired');
+  document.getElementById('right-' + rightId).querySelector('.match-marker').textContent = (leftIdx + 1);
+  r2SelectedLeft = null;
+  document.getElementById('statusBox').innerHTML = '';
+};
+
+window.checkR2 = () => {
+  if (Object.keys(r2Pairs).length < 4) {
+    showStatus('warning', 'Noch nicht fertig', 'Teil 1: Es müssen alle vier Gesetze einer Wirkung zugeordnet sein.');
+    return;
+  }
+  // Teil 2 vollständig ausgefüllt?
+  const t2Incomplete = R2B_BLANKS.some(b => { const el = document.getElementById('r2b-' + b.id); return !el || !el.value; });
+  if (t2Incomplete) {
+    showStatus('warning', 'Noch nicht fertig', 'Teil 2: Bitte wähle in jedem Auswahlfeld des Lückentexts einen Begriff.');
+    return;
+  }
+
+  let allCorrect = true;
+  const errors = [];
+
+  // Teil 1: Zuordnung
+  PUZZLE_R2.pairs.forEach((p, i) => {
+    const leftEl = document.getElementById('left-' + i);
+    const rightId = r2Pairs[i];
+    const rightEl = document.getElementById('right-' + rightId);
+    leftEl.classList.remove('paired');
+    rightEl.classList.remove('paired');
+    if (rightId === p.rightId) {
+      leftEl.classList.add('correct-pair');
+      rightEl.classList.add('correct-pair');
+    } else {
+      leftEl.classList.add('wrong-pair');
+      rightEl.classList.add('wrong-pair');
+      allCorrect = false;
+      const gotRight = PUZZLE_R2.pairs.find(x => x.rightId === rightId);
+      errors.push({
+        kind: 'falsch_zugeordnet',
+        item: p.left + ' (' + p.leftLong + ')',
+        wrongAnswer: gotRight ? gotRight.right : '(unbekannt)',
+        correctAnswer: p.right,
+      });
+    }
+  });
+
+  // Teil 2: Dropdown-Lückentext
+  R2B_BLANKS.forEach(b => {
+    const selEl = document.getElementById('r2b-' + b.id);
+    const val = selEl.value;
+    selEl.classList.remove('correct', 'incorrect');
+    if (val === b.correct) {
+      selEl.classList.add('correct');
+    } else {
+      selEl.classList.add('incorrect');
+      allCorrect = false;
+      errors.push({
+        kind: 'falsche_eingabe',
+        item: 'Lückentext (Textseite): ' + b.label,
+        wrongAnswer: val,
+        correctAnswer: b.correct,
+      });
+    }
+  });
+
+  recordAttempt(1, { errors });
+
+  if (allCorrect) {
+    r2Submitted = true;
+    showStatus('success', 'Raum gelöst', 'Beide Teile korrekt. Die Aktenordner sind sortiert.');
+    setTimeout(() => triggerReveal(1), 900);
+  } else {
+    showStatus('warning', 'Noch nicht alle Antworten stimmen', 'Grün = korrekt, rot = falsch (Teil 1 Paare, Teil 2 Auswahlfelder). Korrigiere die roten und prüfe erneut.');
+    setTimeout(() => {
+      PUZZLE_R2.pairs.forEach((p, i) => {
+        const leftEl = document.getElementById('left-' + i);
+        const rightId = r2Pairs[i];
+        if (rightId !== p.rightId) {
+          // Unpair wrong pairs
+          leftEl.classList.remove('wrong-pair');
+          document.getElementById('right-' + rightId).classList.remove('wrong-pair');
+          document.getElementById('right-' + rightId).querySelector('.match-marker').textContent = '?';
+          leftEl.querySelector('.match-marker').textContent = (i + 1);
+          delete r2Pairs[i];
+        }
+      });
+    }, 3500);
+  }
+};
+
+/* ============================================================
+   ROOM 3: Two-bucket sort (EU vs. Mitgliedstaat)
+   ============================================================ */
+
+let r3Assignments = {};  // cardId -> bucketId
+let r3Selected = null;
+let r3Submitted = false;
+
+function renderRoom3() {
+  state.screen = 'room3';
+  renderSeals();
+  r3Assignments = {};
+  r3Selected = null;
+  r3Submitted = false;
+  const room = ROOMS[2];
+
+  const cards = PUZZLE_R3.cards.map(c => `
+    <button class="sort-card" id="card3-${c.id}" onclick="selectR3(event, '${c.id}')">${c.text}</button>
+  `).join('');
+
+  const buckets = PUZZLE_R3.buckets.map(b => `
+    <div class="bucket" id="bucket3-${b.id}" onclick="placeR3('${b.id}')">
+      <div class="bucket-label">${b.label}</div>
+      <div class="bucket-desc">${b.desc}</div>
+      <div class="bucket-items" id="bucket3-items-${b.id}"></div>
+    </div>
+  `).join('');
+
+  root.innerHTML = `
+    ${roomHeader(room)}
+    <div class="cards-pool" id="r3pool">
+      <div class="cards-pool-label">Politikfelder zum Zuordnen</div>
+      ${cards}
+    </div>
+    <div class="bucket-area">${buckets}</div>
+    ${roomFooter(room,
+      'Bei <em>Steuern</em> und bei <em>Energiemix</em> behalten die Mitgliedstaaten das letzte Wort. Beim <em>Binnenmarkt</em> und <em>Außenhandel</em> regelt die EU einheitlich.',
+      'checkR3()')}
+  `;
+}
+
+window.selectR3 = (event, id) => {
+  if (r3Submitted) return;
+  if (r3Assignments[id]) {
+    // Placed card clicked
+    if (r3Selected) {
+      // Something else is selected — let click bubble to bucket so the new card gets placed
+      return;
+    }
+    // Un-place this card
+    if (event) event.stopPropagation();
+    delete r3Assignments[id];
+    const card = document.getElementById('card3-' + id);
+    card.classList.remove('placed', 'correct', 'incorrect');
+    document.getElementById('r3pool').appendChild(card);
+    return;
+  }
+  // Pool card — select it
+  if (event) event.stopPropagation();
+  document.querySelectorAll('#screenContainer .sort-card.selected').forEach(c => c.classList.remove('selected'));
+  document.getElementById('card3-' + id).classList.add('selected');
+  r3Selected = id;
+  document.querySelectorAll('#screenContainer .bucket').forEach(b => b.classList.add('target'));
+};
+
+window.placeR3 = (bucketId) => {
+  if (r3Submitted || !r3Selected) return;
+  r3Assignments[r3Selected] = bucketId;
+  const card = document.getElementById('card3-' + r3Selected);
+  card.classList.remove('selected');
+  card.classList.add('placed');
+  document.getElementById('bucket3-items-' + bucketId).appendChild(card);
+  r3Selected = null;
+  document.querySelectorAll('#screenContainer .bucket').forEach(b => b.classList.remove('target'));
+};
+
+window.checkR3 = () => {
+  if (Object.keys(r3Assignments).length < PUZZLE_R3.cards.length) {
+    showStatus('warning', 'Noch nicht fertig', `Es sind noch ${PUZZLE_R3.cards.length - Object.keys(r3Assignments).length} Karten im Pool. Ordne sie alle zu.`);
+    return;
+  }
+  let allCorrect = true;
+  let toReset = [];
+  const errors = [];
+  const bucketLabels = {};
+  PUZZLE_R3.buckets.forEach(b => bucketLabels[b.id] = b.label);
+  PUZZLE_R3.cards.forEach(c => {
+    const card = document.getElementById('card3-' + c.id);
+    const assigned = r3Assignments[c.id];
+    card.classList.remove('correct', 'incorrect');
+    if (assigned === c.bucket) {
+      card.classList.add('correct');
+    } else {
+      card.classList.add('incorrect');
+      allCorrect = false;
+      toReset.push(c.id);
+      errors.push({
+        kind: 'falsch_einsortiert',
+        item: c.text,
+        wrongAnswer: bucketLabels[assigned] || '(unbekannt)',
+        correctAnswer: bucketLabels[c.bucket],
+        explanation: c.expl,
+      });
+    }
+  });
+
+  recordAttempt(2, { errors });
+
+  if (allCorrect) {
+    r3Submitted = true;
+    showStatus('success', 'Raum gelöst', 'Alle sechs Politikfelder sind korrekt zugeordnet. Die Subsidiarität ist verstanden.');
+    setTimeout(() => triggerReveal(2), 900);
+  } else {
+    showStatus('warning', 'Einige Zuordnungen sind falsch', 'Die rot markierten Karten gehen automatisch zurück in den Pool. Lies bei Bedarf den Hinweis und versuche es noch einmal.');
+    setTimeout(() => {
+      toReset.forEach(id => {
+        delete r3Assignments[id];
+        const card = document.getElementById('card3-' + id);
+        card.classList.remove('placed', 'correct', 'incorrect');
+        document.getElementById('r3pool').appendChild(card);
+      });
+    }, 3500);
+  }
+};
+
+/* ============================================================
+   ROOM 4: Cloze / number input (Pariser Abkommen)
+   ============================================================ */
+
+let r4Submitted = false;
+
+/* Teil 2: Dropdown-Lückentext zum Erklärfilm / zur Textfassung (Bibliothek 4) */
+const R4B_BANK = ['1,2', 'Kipppunkte', 'unumkehrbar', 'Restbudget', 'Permafrostböden', 'Klimaneutralität', 'Gletscher', 'Klimaerwärmung'];
+const R4B_BLANKS = [
+  { id: 'b1', correct: '1,2', label: 'Temperaturanstieg seit der Industrialisierung (in Grad)' },
+  { id: 'b2', correct: 'Kipppunkte', label: 'abrupte, unumkehrbare Schwellen im Klimasystem' },
+  { id: 'b3', correct: 'unumkehrbar', label: 'Eigenschaft dieser Veränderungen' },
+  { id: 'b4', correct: 'Permafrostböden', label: 'auftauende Böden in Sibirien und Kanada' },
+  { id: 'b5', correct: 'Restbudget', label: 'verbleibendes CO₂-…' },
+  { id: 'b6', correct: 'Klimaneutralität', label: 'Zustand nach Aufbrauchen des Budgets' },
+];
+
+function renderRoom4() {
+  state.screen = 'room4';
+  renderSeals();
+  r4Submitted = false;
+  const room = ROOMS[3];
+
+  const rows = PUZZLE_R4.rows.map(r => `
+    <div class="cloze-row">
+      <div class="cloze-text">
+        ${r.before} <strong>${r.strong}</strong>
+        ${r.after ? ' ' + r.after : ''}
+      </div>
+      <input type="text" class="cloze-input" id="cloze-${r.id}" placeholder="?" autocomplete="off">
+      ${r.unit ? `<span class="cloze-unit">${r.unit}</span>` : ''}
+    </div>
+  `).join('');
+
+  // Teil 2: Optionen nach Buchstabenmenge sortiert (keine Rückschlüsse aus der Reihenfolge)
+  const bank = R4B_BANK.slice().sort((a, b) => a.length - b.length || a.localeCompare(b, 'de'));
+  const sel = (id) => `<select class="cloze-select" id="r4b-${id}"><option value="">— wählen —</option>${bank.map(w => `<option value="${w}">${w}</option>`).join('')}</select>`;
+  const part2 = `
+    <div class="card" style="margin-top: 8px;">
+      <p class="body-lg" style="margin-bottom: 12px;"><strong>Teil 2 · Lückentext zum Erklärfilm.</strong> Wähle für jede Lücke den passenden Begriff.</p>
+      <p class="cloze-prose">
+        Seit Beginn der Industrialisierung ist die globale Durchschnittstemperatur bereits um etwa ${sel('b1')} Grad gestiegen.
+        Steigt sie weiter, drohen ab rund zwei Grad sogenannte ${sel('b2')} – das Klimasystem verändert sich dann abrupt und ${sel('b3')}.
+        Ein Beispiel sind die auftauenden ${sel('b4')} in Sibirien und Kanada, deren freigesetzte Treibhausgase einen Dominoeffekt auslösen können.
+        Die Wissenschaft beziffert ein verbleibendes CO₂-${sel('b5')}; ist es aufgebraucht, muss ${sel('b6')} herrschen – es darf dann nur noch so viel ausgestoßen werden, wie die Natur wieder aufnimmt.
+      </p>
+    </div>`;
+
+  root.innerHTML = `
+    ${roomHeader(room)}
+    <p class="body-lg" style="margin: 6px 0 4px;"><strong>Teil 1 · Eckdaten des Pariser Abkommens.</strong> Trage die korrekten Zahlen/Begriffe ein.</p>
+    <div class="cloze-grid">${rows}</div>
+    ${part2}
+    ${roomFooter(room,
+      'Teil 1: Das Pariser Abkommen wurde auf der COP21 unterzeichnet; schärferes Temperaturziel 1,5 statt 2,0; EU-Klimaneutralität Mitte des Jahrhunderts; EU-Ziel 2030 über die Hälfte; NDC = Beiträge auf Englisch. — Teil 2: vorindustrielle Basis +1,2 Grad; ab 2 Grad „Kipppunkte" (abrupt, unumkehrbar); auftauende Permafrostböden; verbleibendes CO₂-Restbudget; danach Klimaneutralität.',
+      'checkR4()')}
+  `;
+}
+
+function normalizeAnswer(s) {
+  return String(s).trim().toLowerCase().replace(',', '.').replace(/\s+/g, ' ');
+}
+
+window.checkR4 = () => {
+  let allCorrect = true;
+  let anyAnswered = false;
+  const errors = [];
+  PUZZLE_R4.rows.forEach(r => {
+    const inp = document.getElementById('cloze-' + r.id);
+    const val = normalizeAnswer(inp.value);
+    if (!val) { allCorrect = false; return; }
+    anyAnswered = true;
+    inp.classList.remove('correct', 'incorrect');
+    const accepts = (r.accepts || [r.answer]).map(a => normalizeAnswer(a));
+    let ok = accepts.includes(val);
+    // For numbers, check tolerance
+    if (!ok && r.type === 'number') {
+      const num = parseFloat(val.replace(',', '.'));
+      const target = parseFloat(String(r.answer).replace(',', '.'));
+      if (!isNaN(num) && !isNaN(target) && Math.abs(num - target) <= (r.tolerance || 0)) ok = true;
+    }
+    if (ok) {
+      inp.classList.add('correct');
+    } else {
+      inp.classList.add('incorrect');
+      allCorrect = false;
+      // Reconstruct the question text
+      const qtext = (r.before + ' ___ ' + (r.after || '')).replace(/\s+/g, ' ').trim();
+      errors.push({
+        kind: 'falsche_eingabe',
+        item: qtext,
+        wrongAnswer: inp.value,
+        correctAnswer: r.answer + (r.unit ? ' ' + r.unit : ''),
+      });
+    }
+  });
+
+  // Teil 2: Dropdown-Lückentext
+  R4B_BLANKS.forEach(b => {
+    const selEl = document.getElementById('r4b-' + b.id);
+    if (!selEl) return;
+    const val = selEl.value;
+    selEl.classList.remove('correct', 'incorrect');
+    if (!val) { allCorrect = false; return; }
+    anyAnswered = true;
+    if (val === b.correct) {
+      selEl.classList.add('correct');
+    } else {
+      selEl.classList.add('incorrect');
+      allCorrect = false;
+      errors.push({
+        kind: 'falsche_eingabe',
+        item: 'Lückentext (Erklärfilm): ' + b.label,
+        wrongAnswer: val,
+        correctAnswer: b.correct,
+      });
+    }
+  });
+
+  if (!anyAnswered) {
+    showStatus('warning', 'Bitte ausfüllen', 'Trage Werte ein und versuche es dann erneut.');
+    return;
+  }
+
+  recordAttempt(3, { errors });
+
+  if (allCorrect) {
+    r4Submitted = true;
+    showStatus('success', 'Raum gelöst', 'Beide Teile korrekt. Das Pariser Briefing ist entschlüsselt.');
+    setTimeout(() => triggerReveal(3), 900);
+  } else {
+    showStatus('warning', 'Noch nicht alle Antworten stimmen', 'Prüfe Teil 1 (rot markierte Felder) und Teil 2 (rot markierte Auswahlfelder) und korrigiere sie.');
+  }
+};
+
+/* ============================================================
+   ROOM 5: Four-bucket sort (Nachhaltigkeitsdimensionen)
+   ============================================================ */
+
+let r5Assignments = {};
+let r5Selected = null;
+let r5Submitted = false;
+
+function renderRoom5() {
+  state.screen = 'room5';
+  renderSeals();
+  r5Assignments = {};
+  r5Selected = null;
+  r5Submitted = false;
+  const room = ROOMS[4];
+
+  // Karten zufällig mischen (Fisher-Yates), damit die Eingangs-Reihenfolge die Kategorie nicht verrät.
+  // Wichtig: nur die Kopie mischen, nicht das Original-Array — sonst stimmt die Check-Logik beim Retry nicht mehr.
+  const shuffled = [...PUZZLE_R5.cards];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  const cards = shuffled.map(c => `
+    <button class="sort-card" id="card5-${c.id}" onclick="selectR5(event, '${c.id}')">${c.text}</button>
+  `).join('');
+
+  const buckets = PUZZLE_R5.buckets.map(b => `
+    <div class="bucket" id="bucket5-${b.id}" onclick="placeR5('${b.id}')">
+      <div class="bucket-label">${b.label}</div>
+      <div class="bucket-desc">${b.desc}</div>
+      <div class="bucket-items" id="bucket5-items-${b.id}"></div>
+    </div>
+  `).join('');
+
+  root.innerHTML = `
+    ${roomHeader(room)}
+    <div class="cards-pool" id="r5pool">
+      <div class="cards-pool-label">Maßnahmen (klick → klick aufs Zielfeld)</div>
+      ${cards}
+    </div>
+    <div class="bucket-area quad">${buckets}</div>
+    ${roomFooter(room,
+      'Effizienz = <em>gleichen Nutzen mit weniger Ressourcen</em>. Suffizienz = <em>weniger nutzen</em>. Konsistenz = <em>andere Stoffe / Naturkreisläufe</em>. Partizipation = <em>Menschen entscheiden mit</em>.',
+      'checkR5()')}
+  `;
+}
+
+window.selectR5 = (event, id) => {
+  if (r5Submitted) return;
+  if (r5Assignments[id]) {
+    if (r5Selected) return;
+    if (event) event.stopPropagation();
+    delete r5Assignments[id];
+    const card = document.getElementById('card5-' + id);
+    card.classList.remove('placed', 'correct', 'incorrect');
+    document.getElementById('r5pool').appendChild(card);
+    return;
+  }
+  if (event) event.stopPropagation();
+  document.querySelectorAll('#screenContainer .sort-card.selected').forEach(c => c.classList.remove('selected'));
+  document.getElementById('card5-' + id).classList.add('selected');
+  r5Selected = id;
+  document.querySelectorAll('#screenContainer .bucket').forEach(b => b.classList.add('target'));
+};
+
+window.placeR5 = (bucketId) => {
+  if (r5Submitted || !r5Selected) return;
+  r5Assignments[r5Selected] = bucketId;
+  const card = document.getElementById('card5-' + r5Selected);
+  card.classList.remove('selected');
+  card.classList.add('placed');
+  document.getElementById('bucket5-items-' + bucketId).appendChild(card);
+  r5Selected = null;
+  document.querySelectorAll('#screenContainer .bucket').forEach(b => b.classList.remove('target'));
+};
+
+window.checkR5 = () => {
+  if (Object.keys(r5Assignments).length < PUZZLE_R5.cards.length) {
+    showStatus('warning', 'Noch nicht fertig', `Noch ${PUZZLE_R5.cards.length - Object.keys(r5Assignments).length} Karten im Pool.`);
+    return;
+  }
+  let allCorrect = true;
+  let toReset = [];
+  const errors = [];
+  const bucketLabels = {};
+  PUZZLE_R5.buckets.forEach(b => bucketLabels[b.id] = b.label);
+  PUZZLE_R5.cards.forEach(c => {
+    const card = document.getElementById('card5-' + c.id);
+    card.classList.remove('correct', 'incorrect');
+    if (r5Assignments[c.id] === c.bucket) {
+      card.classList.add('correct');
+    } else {
+      card.classList.add('incorrect'); allCorrect = false; toReset.push(c.id);
+      errors.push({
+        kind: 'falsch_einsortiert',
+        item: c.text,
+        wrongAnswer: bucketLabels[r5Assignments[c.id]] || '(unbekannt)',
+        correctAnswer: bucketLabels[c.bucket],
+      });
+    }
+  });
+
+  recordAttempt(4, { errors });
+
+  if (allCorrect) {
+    r5Submitted = true;
+    showStatus('success', 'Raum gelöst', 'Alle zwölf Karten korrekt sortiert. Die vier Säulen stehen.');
+    setTimeout(() => triggerReveal(4), 900);
+  } else {
+    showStatus('warning', 'Einige Karten sind falsch einsortiert', 'Rote Karten kehren in den Pool zurück. Überlege bei jeder: gleicher Nutzen + weniger? (Effizienz) oder ganz drauf verzichten? (Suffizienz) oder anderer Stoffkreislauf? (Konsistenz) oder Mitsprache? (Partizipation)');
+    setTimeout(() => {
+      toReset.forEach(id => {
+        delete r5Assignments[id];
+        const card = document.getElementById('card5-' + id);
+        card.classList.remove('placed', 'correct', 'incorrect');
+        document.getElementById('r5pool').appendChild(card);
+      });
+    }, 4000);
+  }
+};
+
+/* ============================================================
+   ROOM 6: Level-assignment (Subsidiarität – 4 levels)
+   ============================================================ */
+
+let r6Assignments = {};
+let r6Selected = null;
+let r6Submitted = false;
+
+function renderRoom6() {
+  state.screen = 'room6';
+  renderSeals();
+  r6Assignments = {};
+  r6Selected = null;
+  r6Submitted = false;
+  const room = ROOMS[5];
+
+  const cards = PUZZLE_R6.cases.map(c => `
+    <button class="sort-card" id="card6-${c.id}" onclick="selectR6(event, '${c.id}')">${c.text}</button>
+  `).join('');
+
+  const buckets = PUZZLE_R6.levels.map(l => `
+    <div class="bucket" id="bucket6-${l.id}" onclick="placeR6('${l.id}')">
+      <div class="bucket-label">${l.label}</div>
+      <div class="bucket-items" id="bucket6-items-${l.id}"></div>
+    </div>
+  `).join('');
+
+  root.innerHTML = `
+    ${roomHeader(room)}
+    <div class="cards-pool" id="r6pool">
+      <div class="cards-pool-label">Klimaprobleme (klick → klick aufs Zielfeld)</div>
+      ${cards}
+    </div>
+    <div class="bucket-area quad">${buckets}</div>
+    ${roomFooter(room,
+      'Grundsatz: <em>So lokal wie möglich, so weit oben wie nötig.</em> Probleme, die <strong>Grenzen überschreiten</strong>, gehören eine Ebene höher.',
+      'checkR6()')}
+  `;
+}
+
+window.selectR6 = (event, id) => {
+  if (r6Submitted) return;
+  if (r6Assignments[id]) {
+    if (r6Selected) return;
+    if (event) event.stopPropagation();
+    delete r6Assignments[id];
+    const card = document.getElementById('card6-' + id);
+    card.classList.remove('placed', 'correct', 'incorrect');
+    document.getElementById('r6pool').appendChild(card);
+    return;
+  }
+  if (event) event.stopPropagation();
+  document.querySelectorAll('#screenContainer .sort-card.selected').forEach(c => c.classList.remove('selected'));
+  document.getElementById('card6-' + id).classList.add('selected');
+  r6Selected = id;
+  document.querySelectorAll('#screenContainer .bucket').forEach(b => b.classList.add('target'));
+};
+
+window.placeR6 = (levelId) => {
+  if (r6Submitted || !r6Selected) return;
+  r6Assignments[r6Selected] = levelId;
+  const card = document.getElementById('card6-' + r6Selected);
+  card.classList.remove('selected');
+  card.classList.add('placed');
+  document.getElementById('bucket6-items-' + levelId).appendChild(card);
+  r6Selected = null;
+  document.querySelectorAll('#screenContainer .bucket').forEach(b => b.classList.remove('target'));
+};
+
+window.checkR6 = () => {
+  if (Object.keys(r6Assignments).length < PUZZLE_R6.cases.length) {
+    showStatus('warning', 'Noch nicht fertig', `Noch ${PUZZLE_R6.cases.length - Object.keys(r6Assignments).length} Probleme zuzuordnen.`);
+    return;
+  }
+  let allCorrect = true;
+  let toReset = [];
+  const errors = [];
+  const levelLabels = {};
+  PUZZLE_R6.levels.forEach(l => levelLabels[l.id] = l.label);
+  PUZZLE_R6.cases.forEach(c => {
+    const card = document.getElementById('card6-' + c.id);
+    card.classList.remove('correct', 'incorrect');
+    if (r6Assignments[c.id] === c.level) {
+      card.classList.add('correct');
+    } else {
+      card.classList.add('incorrect'); allCorrect = false; toReset.push(c.id);
+      errors.push({
+        kind: 'falsche_ebene',
+        item: c.text,
+        wrongAnswer: levelLabels[r6Assignments[c.id]] || '(unbekannt)',
+        correctAnswer: levelLabels[c.level],
+        explanation: c.expl,
+      });
+    }
+  });
+
+  recordAttempt(5, { errors });
+
+  if (allCorrect) {
+    r6Submitted = true;
+    showStatus('success', 'Letzter Raum gelöst', 'Du hast das Mehrebenensystem im Griff. Die letzte Tür öffnet sich.');
+    setTimeout(() => triggerReveal(5), 900);
+  } else {
+    showStatus('warning', 'Noch nicht alle Zuordnungen stimmen', 'Frage dich bei jedem roten Fall: Wo enden die Folgen? Bei der Stadt? Beim Bundesland? Bei der EU? Oder weltweit?');
+    setTimeout(() => {
+      toReset.forEach(id => {
+        delete r6Assignments[id];
+        const card = document.getElementById('card6-' + id);
+        card.classList.remove('placed', 'correct', 'incorrect');
+        document.getElementById('r6pool').appendChild(card);
+      });
+    }, 4000);
+  }
+};
+
+/* ============================================================
+   LETTER REVEAL & PROGRESSION
+   ============================================================ */
+
+function triggerReveal(roomIdx) {
+  state.solved[roomIdx] = true;
+  state.letters[roomIdx] = CODE_WORD[roomIdx];
+
+  const overlay = document.getElementById('revealOverlay');
+  document.getElementById('revealLetter').textContent = CODE_WORD[roomIdx];
+  document.getElementById('revealCaption').textContent = `Buchstabe ${roomIdx + 1} von 6 freigeschaltet`;
+
+  // Build the progress letters
+  const progBox = document.getElementById('revealProgress');
+  progBox.innerHTML = '';
+  for (let i = 0; i < 6; i++) {
+    const span = document.createElement('span');
+    span.className = 'reveal-progress-letter' + (state.solved[i] ? ' lit' : '');
+    span.textContent = state.solved[i] ? CODE_WORD[i] : '·';
+    progBox.appendChild(span);
+  }
+
+  // Button: continue
+  const btn = document.getElementById('revealContinue');
+  const isLast = roomIdx === 5;
+  btn.textContent = isLast ? 'Verhandlungssaal betreten' : 'Nächste Bibliothek betreten';
+  btn.onclick = () => {
+    overlay.classList.remove('show');
+    setTimeout(() => {
+      if (isLast) renderFinal();
+      else goLibrary(roomIdx + 2);  // next library (roomIdx 0 = room 1 → goLibrary(2))
+    }, 300);
+  };
+
+  overlay.classList.add('show');
+}
+
+/* ============================================================
+   FINAL SCREEN
+   ============================================================ */
+
+function renderFinal() {
+  state.screen = 'final';
+  if (!state.completedAt) state.completedAt = new Date();
+  renderSeals();
+
+  // Count first-attempt errors
+  const totalErrors = state.mistakes.reduce((a, m) => a + (m && m.errors ? m.errors.length : 0), 0);
+  const perfectRooms = state.attempts.filter((a, i) => a === 1 && (!state.mistakes[i] || !state.mistakes[i].errors || state.mistakes[i].errors.length === 0)).length;
+  const errorSummary = totalErrors === 0
+    ? `Alle sechs Räume im ersten Versuch perfekt – beeindruckend, ${state.firstName}.`
+    : `Du hast ${perfectRooms} von 6 Räumen im ersten Versuch fehlerfrei gelöst (${totalErrors} Fehler im ersten Versuch) – kein Problem, das gehört zum Lernen. Im „Überblick deiner Antworten & Erläuterungen" findest du sie alle mit Erklärung.`;
+
+  root.innerHTML = `
+    <div class="final-hero">
+      <div class="kicker">Abschluss · Codewort freigeschaltet</div>
+      <div class="final-code" id="finalCode">${CODE_WORD}</div>
+      <div class="final-suffix">— Verhandlungssaal —</div>
+      <p class="lede" style="margin: 24px auto 0; max-width: 56ch;">
+        Geschafft, ${state.firstName}. Du hast alle sechs Räume bewältigt. Das Codewort der europäischen Klimapolitik:
+        sechs Buchstaben für sechs Ebenen, Instrumente und Verantwortungen.
+      </p>
+      <p class="text-mute" style="margin-top: 16px; max-width: 56ch; margin-left: auto; margin-right: auto; font-size: 14px;">
+        ${errorSummary}
+      </p>
+    </div>
+
+    <div class="card" style="padding: 32px 36px;">
+      <h2 style="font-size:24px; margin-bottom: 8px;">Zwei Schritte zum Abschluss</h2>
+      <p class="text-mute" style="font-size: 14px; margin-bottom: 24px;">Beide sind nötig, damit deine Lehrkraft den Abschluss verbuchen kann.</p>
+
+      <div class="final-actions">
+        <button class="final-action" onclick="downloadMistakesPDF()">
+          <div class="icon-row">
+            <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8" fill="none" stroke="#0a1428" stroke-width="1.5"/>
+              <line x1="9" y1="13" x2="15" y2="13" stroke="#0a1428" stroke-width="1.8"/>
+              <line x1="9" y1="16" x2="15" y2="16" stroke="#0a1428" stroke-width="1.8"/>
+            </svg>
+            <span class="label">Schritt 1 · Pflicht</span>
+          </div>
+          <div class="title">„Überblick deiner Antworten & Erläuterungen" herunterladen</div>
+          <div class="desc">Persönliches PDF mit deinem Namen, Geburtsdatum, dem Bestätigungscode und dem Abschlusszeitpunkt – plus einer Seite mit Lösungserläuterungen. <strong style="color:var(--c-gold)">Lade dieses PDF in Moodle hoch.</strong></div>
+        </button>
+
+        <button class="final-action" onclick="openFeiditor()">
+          <div class="icon-row">
+            <svg class="icon" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8" fill="none" stroke="#0a1428" stroke-width="1.5"/>
+              <path d="M16.5 11.5l1.4 1.4-4.2 4.2-1.6.2.2-1.6z" fill="none" stroke="#0a1428" stroke-width="1.5" stroke-linejoin="round"/>
+            </svg>
+            <span class="label">Schritt 2 · Digitales Arbeitsblatt</span>
+          </div>
+          <div class="title">Arbeitsblatt im Feiditor öffnen</div>
+          <div class="desc">Der Feiditor öffnet sich in einem neuen Fenster mit den vorgegebenen Aufgaben. Beantworte sie dort, wandle deinen Text in eine PDF um und <strong style="color:var(--c-gold)">lade auch diese PDF in Moodle hoch.</strong></div>
+        </button>
+      </div>
+
+      <div style="margin-top:32px; padding-top:24px; border-top:1px solid var(--c-border-soft);">
+        <h3 style="font-family:var(--font-display); font-size:18px; font-weight:600; margin-bottom:12px;">Was du jetzt weißt</h3>
+        <ul class="muted-list" style="font-size:14px;">
+          <li><strong style="color:var(--c-gold)">Kommune</strong> – Wärmeplanung, Radwege, Stadtbegrünung, kommunale Gebäude</li>
+          <li><strong style="color:var(--c-gold)">Bund</strong> – Klimaschutzgesetz, BEHG, GEG, Immissionsschutz</li>
+          <li><strong style="color:var(--c-gold)">EU</strong> – Binnenmarktnormen, Emissionshandel, CBAM, Außenhandelspolitik</li>
+          <li><strong style="color:var(--c-gold)">Global</strong> – Pariser Abkommen, FCKW-Verbot, Flugverkehr, NDCs</li>
+          <li><strong style="color:var(--c-gold)">Nachhaltigkeit</strong> – Effizienz, Suffizienz, Konsistenz, Partizipation als vier Hebel</li>
+          <li><strong style="color:var(--c-gold)">Subsidiarität</strong> – So lokal wie möglich, so weit oben wie nötig</li>
+        </ul>
+      </div>
+
+      <div class="btn-row" style="margin-top:32px;">
+        <button class="btn btn-ghost" onclick="restartGame()">Erneut spielen</button>
+      </div>
+    </div>
+  `;
+}
+
+window.copyCode = async () => {
+  try {
+    await navigator.clipboard.writeText(state.code);
+    document.getElementById('copyDesc').innerHTML = '<strong style="color:var(--c-success)">✓ In die Zwischenablage kopiert.</strong> Trage den Code jetzt in Moodle ein.';
+  } catch (e) {
+    document.getElementById('copyDesc').innerHTML = `Code: <strong class="font-mono" style="color:var(--c-gold)">${state.code}</strong> – bitte manuell kopieren.`;
+  }
+};
+
+/* ============================================================
+   PDF 2 — Reflexions-Datei (dynamisch erzeugt)
+   ============================================================ */
+const REFLECT_TASKS = [
+  'Erkläre in eigenen Worten, wofür eine Kommune (Stadt, Gemeinde, Landkreis) in der Klimapolitik zuständig ist – und wofür nicht. Nenne je zwei eigene Beispiele. (Bibliotheksraum 1)',
+  'Fasse die vier zentralen Bundesgesetze der Klimapolitik in eigenen Worten zusammen: Was bewirken KSG, BEHG, GEG und BImSchG jeweils? (Bibliotheksraum 2)',
+  'Erkläre das Subsidiaritätsprinzip in eigenen Worten. Warum regelt die EU z. B. CO2-Grenzwerte für Autos, während der Energiemix in der Hand der Mitgliedstaaten bleibt? (Bibliotheksraum 3)',
+  'Beschreibe das Pariser Abkommen mit eigenen Worten: Was wurde dort vereinbart, und was bedeutet der Begriff „NDC"? (Bibliotheksraum 4)',
+  'Vergleiche zwei der vier Nachhaltigkeitssäulen (Effizienz, Suffizienz, Konsistenz, Partizipation): Worin unterscheiden sie sich grundsätzlich? Nenne zu jeder ein eigenes Beispiel. (Bibliotheksraum 5)',
+  'Erläutere die Regel „so lokal wie möglich, so weit oben wie nötig" an einem selbst gewählten Klimaproblem: Auf welcher Ebene würdest du es regeln und warum? (Bibliotheksraum 6)',
+  'Bearbeite nun auf Moodle die Aufgabe „Text verfassen …".',
+  'Lade diese Reflexions-Datei in der dafür vorgesehenen Abgabe bei Moodle hoch.',
+];
+
+function generateReflexionPdf() {
+  const doc = new PdfDoc();
+  const W = doc.pageW, H = doc.pageH, M = doc.margin; const CW = W - 2 * M;
+  const PRIMARY = [27, 73, 101], GOLD = [212, 175, 55], MUTE = [108, 120, 136], TEXT = [25, 25, 25], LINE = [205, 205, 205];
+
+  function header() {
+    doc.startPage();
+    doc.rect(0, H - 72, W, 72, PRIMARY);
+    doc.text('Reflexion — EU-Klimagipfel', M, H - 38, 18, true, [255, 255, 255]);
+    doc.text('Escape-Room „EU-Klimagipfel" · Bearbeite die Aufgaben in eigenen Worten', M, H - 58, 9, false, [214, 226, 228]);
+    return H - 72 - 22;
+  }
+  function ensure(y, need) { if (y - need < 70) { doc.endPage(); return header(); } return y; }
+
+  let y = header();
+
+  // Identifikationsblock: Name, Geburtsdatum, Zeitpunkt der Vollendung
+  const bH = 58;
+  doc.rect(M, y - bH, CW, bH, [244, 248, 251]);
+  doc.rect(M, y - bH, 3, bH, GOLD);
+  doc.text('NAME', M + 14, y - 15, 8, true, GOLD);
+  doc.text(state.firstName + ' ' + state.lastName, M + 14, y - 30, 12.5, true, PRIMARY);
+  doc.text('GEBURTSDATUM', M + 260, y - 15, 8, true, GOLD);
+  doc.text(state.birthDate, M + 260, y - 30, 11, false, TEXT);
+  doc.text('ESCAPE-ROOM ABGESCHLOSSEN AM', M + 14, y - 46, 8, true, GOLD);
+  doc.text(fmtDateTime(state.completedAt), M + 200, y - 46, 10, false, TEXT);
+  y -= bH + 16;
+
+  y = doc.paragraph('Diese Reflexion vertieft die Inhalte aus den Bibliotheksräumen. Beantworte die folgenden Aufgaben in eigenen Worten – stichpunktartig oder in ganzen Sätzen.',
+    M, y, CW, 10.5, false, TEXT, 14);
+  y -= 8;
+
+  for (let i = 0; i < REFLECT_TASKS.length; i++) {
+    const isLast = i === REFLECT_TASKS.length - 1;
+    const isSecondLast = i === REFLECT_TASKS.length - 2;
+    y = ensure(y, (isLast || isSecondLast) ? 70 : 120);
+    doc.text('Aufgabe ' + (i + 1), M, y, 11, true, GOLD);
+    y -= 15;
+    y = doc.paragraph(REFLECT_TASKS[i], M, y, CW, 11, true, TEXT, 15);
+    y -= 8;
+    if (isLast || isSecondLast) {
+      // Moodle-Aufgaben: Checkbox statt Schreiblinien
+      doc.rect(M, y - 12, 12, 12, null, MUTE);
+      doc.text('erledigt', M + 20, y - 10, 9.5, false, MUTE);
+      y -= 26;
+    } else {
+      // Schreiblinien
+      for (let l = 0; l < 4; l++) { y -= 20; doc.line(M, y, M + CW, y, LINE, 0.5); }
+      y -= 14;
+    }
+  }
+
+  y = ensure(y, 30);
+  doc.line(M, y, M + CW, y, LINE, 0.4); y -= 14;
+  doc.text('Copyright Jan-Rickmer Feindt', M, y, 8.5, false, MUTE);
+  doc.endPage();
+  return doc.toBase64();
+}
+
+/* ============================================================
+   DOWNLOAD-HELFER
+   ============================================================ */
+function translit(s) {
+  return (s || '').replace(/ä/g, 'ae').replace(/ö/g, 'oe').replace(/ü/g, 'ue')
+    .replace(/Ä/g, 'Ae').replace(/Ö/g, 'Oe').replace(/Ü/g, 'Ue').replace(/ß/g, 'ss')
+    .replace(/[^a-zA-Z0-9-]/g, '');
+}
+function downloadPdfBase64(b64, filename) {
+  const binary = atob(b64); const bytes = new Uint8Array(binary.length);
+  for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+  const blob = new Blob([bytes], { type: 'application/pdf' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a'); link.href = url; link.download = filename;
+  document.body.appendChild(link); link.click(); document.body.removeChild(link);
+  setTimeout(() => URL.revokeObjectURL(url), 1200);
+}
+
+window.downloadReflexionPDF = () => {
+  try {
+    const b64 = generateReflexionPdf();
+    const name = translit(state.lastName) || 'Schueler';
+    downloadPdfBase64(b64, `Reflexion_${name}_${state.code}.pdf`);
+  } catch (e) {
+    console.error('Reflexion PDF generation failed:', e);
+    alert('Konnte die Reflexions-Datei nicht erzeugen: ' + e.message);
+  }
+};
+
+/* ============================================================
+   DIGITALES ARBEITSBLATT IM FEIDITOR
+   (Programmierung wie in den Referenz-Escape-Rooms; nur die
+    Aufgabenstellungen stammen aus dem bisherigen EU-Arbeitsblatt)
+   ============================================================ */
+window.openFeiditor = () => {
+  try {
+    const tplEl = document.getElementById('feiditor-src');
+    if (!tplEl) { alert('Der Feiditor konnte nicht geladen werden.'); return; }
+    // Eingebetteten Feiditor-Quelltext holen und die escapten Script-End-Tags wiederherstellen
+    let html = tplEl.textContent.replace(/<\\\/script>/gi, '<\/script>');
+    // Escape-Room-Daten + die ersten sechs Aufgaben in den Feiditor injizieren (vor </head>)
+    const data = {
+      firstName: state.firstName,
+      lastName:  state.lastName,
+      birthDate: state.birthDate,
+      code:      state.code,
+      tasks:     REFLECT_TASKS.slice(0, 6)
+    };
+    const inject = '<script>window.__ESCAPE_DATA__=' + JSON.stringify(data).replace(/</g, '\\u003c') + ';<\/script>';
+    if (html.indexOf('</head>') !== -1) html = html.replace('</head>', inject + '\n</head>');
+    else html = inject + html;
+    // Per document.write öffnen, damit der sichere Kontext (crypto.subtle) erhalten bleibt.
+    // Ein Blob-URL würde den secure context verlieren -> Verschlüsselung schlägt fehl.
+    const win = window.open('', '_blank');
+    if (!win) { alert('Bitte erlaube Pop-ups für diese Seite, damit sich das digitale Arbeitsblatt öffnen kann.'); return; }
+    win.document.open();
+    win.document.write(html);
+    win.document.close();
+  } catch (e) { console.error(e); alert('Das digitale Arbeitsblatt konnte nicht geöffnet werden: ' + e.message); }
+};
+
+window.downloadMistakesPDF = () => {
+  try {
+    const b64 = generateMistakesPdf();
+    const name = translit(state.lastName) || 'Schueler';
+    downloadPdfBase64(b64, `Ueberblick_${name}_${state.code}.pdf`);
+  } catch (e) {
+    console.error('Overview PDF generation failed:', e);
+    alert('Konnte die Datei „Überblick deiner Antworten & Erläuterungen" nicht erzeugen: ' + e.message);
+  }
+};
+
+window.restartGame = () => {
+  state = {
+    screen: 'name',
+    firstName: '',
+    lastName: '',
+    birthDate: '',
+    code: '',
+    solved: [false, false, false, false, false, false],
+    letters: ['_', '_', '_', '_', '_', '_'],
+    mistakes: [null, null, null, null, null, null],
+    attempts: [0, 0, 0, 0, 0, 0],
+    completedAt: null,
+  };
+  window.state = state;
+  renderNameInput();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+};
+
+/* ============================================================
+   ROUTER
+   ============================================================ */
+
+window.goRoom = (n) => {
+  window.scrollTo({ top: 0, behavior: 'instant' });
+  switch (n) {
+    case 1: renderRoom1(); break;
+    case 2: renderRoom2(); break;
+    case 3: renderRoom3(); break;
+    case 4: renderRoom4(); break;
+    case 5: renderRoom5(); break;
+    case 6: renderRoom6(); break;
+  }
+};
+
+/* ============================================================
+   INIT
+   ============================================================ */
+
+renderNameInput();
+</script>
+</body>
+</html>

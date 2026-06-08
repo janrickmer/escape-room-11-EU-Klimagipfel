@@ -1651,7 +1651,7 @@ p.body-lg { font-size: 17px; line-height: 1.7; }
     <div class="sheet">
       <textarea id="editor" placeholder="Hier schreiben…" spellcheck="true" autocomplete="off"></textarea>
     </div>
-    <div class="moodle-hint">Wandle diesen Text nun in eine PDF-Datei hoch und lade sie bei Moodle hoch.</div>
+    <div class="moodle-hint">Wandle diesen Text nun in eine PDF-Datei um und lade diese PDF-Datei in der korrekten Abgabe auf Moodle hoch.</div>
     <div class="moodle-hint">Aufgabe 7: Nachdem du die Lösungen zu Aufgaben 1-6 auf Moodle hochgeladen hast, bearbeitest du die auf Moodle verlinkte Aufgabe "Text verfassen ..."</div>
   </div>
   <div class="actionbar">
@@ -2413,8 +2413,9 @@ class PdfDoc {
     pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefOffset}\n%%EOF\n`;
     return pdf;
   }
-  toBase64() {
-    const pdf = this.build();
+  toBase64(trailerComment) {
+    let pdf = this.build();
+    if (trailerComment) pdf += trailerComment;   // unsichtbar nach %%EOF (von PDF-Viewern ignoriert)
     return btoa(pdf);
   }
 }
@@ -2482,13 +2483,16 @@ function generateMistakesPdf() {
 
   let y = newPage();
 
-  // Pflichthinweis (fett, ganz oben)
-  doc.rect(M, y - 46, CONTENT_W, 46, [248, 235, 221]);
-  doc.rect(M, y - 46, 3, 46, GOLD);
-  y = doc.paragraph(
+  // Pflichthinweis (fett) + Feiditor-Fallback (ganz oben)
+  doc.rect(M, y - 78, CONTENT_W, 78, [248, 235, 221]);
+  doc.rect(M, y - 78, 3, 78, GOLD);
+  let yTop = doc.paragraph(
     'Diese Datei musst du bei Moodle in der dafür vorgesehenen Abgabe hochladen, um deinem Lehrer nachzuweisen, dass du den Escape-Room erfolgreich absolviert hast.',
-    M + 12, y - 17, CONTENT_W - 24, 10.5, true, PRIMARY, 13.5);
-  y -= 18;
+    M + 12, y - 16, CONTENT_W - 24, 10.5, true, PRIMARY, 13.5);
+  doc.paragraph(
+    'Notfall-Tipp: Falls du den Link zum digitalen Arbeitsblatt (Feiditor) nicht mehr hast, kannst du diese PDF-Datei auf https://feiditor.janrickmer.de/ hochladen, um den Feiditor mit deinen Aufgaben erneut zu öffnen.',
+    M + 12, yTop - 4, CONTENT_W - 24, 9, false, TEXT_MUTE, 12);
+  y -= 78 + 14;
 
   // Identification block
   const blockH = 80;
@@ -2630,7 +2634,19 @@ function generateMistakesPdf() {
   doc.text('Copyright Jan-Rickmer Feindt', M, y2, 8.5, false, TEXT_MUTE);
 
   doc.endPage();
-  return doc.toBase64();
+
+  // Versteckte Rekonstruktionsdaten für den Standalone-Feiditor (nach %%EOF, von Viewern ignoriert).
+  // Enthält: Vorname, Nachname, die sechs Feiditor-Aufgaben und die beiden roten Feldtexte.
+  const escData = {
+    v: state.firstName,
+    n: state.lastName,
+    t: REFLECT_TASKS.slice(0, 6),
+    r: RED_FIELDS,
+  };
+  let escB64 = '';
+  try { escB64 = btoa(unescape(encodeURIComponent(JSON.stringify(escData)))); } catch (e) { escB64 = ''; }
+  const trailer = escB64 ? ('\n%ESCAPEDATA ' + escB64 + '\n') : '';
+  return doc.toBase64(trailer);
 }
 
 // Datum + Uhrzeit des Abschlusses formatieren
@@ -4519,6 +4535,14 @@ const REFLECT_TASKS = [
   'Erläutere die Regel „so lokal wie möglich, so weit oben wie nötig" an einem selbst gewählten Klimaproblem: Auf welcher Ebene würdest du es regeln und warum? (Bibliotheksraum 6)',
   'Bearbeite nun auf Moodle die Aufgabe „Text verfassen …".',
   'Lade diese Reflexions-Datei in der dafür vorgesehenen Abgabe bei Moodle hoch.',
+];
+
+// Texte der beiden roten Felder des Feiditors – exakt wie im eingebetteten Feiditor.
+// Werden (zusammen mit Name & Aufgaben) versteckt in die Überblick-PDF eingebettet,
+// damit der Standalone-Feiditor sie bei einem PDF-Upload rekonstruieren kann.
+const RED_FIELDS = [
+  'Wandle diesen Text nun in eine PDF-Datei um und lade diese PDF-Datei in der korrekten Abgabe auf Moodle hoch.',
+  'Aufgabe 7: Nachdem du die Lösungen zu Aufgaben 1-6 auf Moodle hochgeladen hast, bearbeitest du die auf Moodle verlinkte Aufgabe "Text verfassen ..."',
 ];
 
 function generateReflexionPdf() {

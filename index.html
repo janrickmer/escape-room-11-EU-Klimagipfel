@@ -4645,7 +4645,24 @@ window.downloadMistakesPDF = () => {
   try {
     const b64 = generateMistakesPdf();
     const name = translit(state.lastName) || 'Schueler';
-    downloadPdfBase64(b64, `Ueberblick_${name}_${state.code}.pdf`);
+    const filename = `Ueberblick_${name}_${state.code}.pdf`;
+    // Blob + Object-URL erzeugen
+    const binary = atob(b64);
+    const bytes = new Uint8Array(binary.length);
+    for (let i = 0; i < binary.length; i++) bytes[i] = binary.charCodeAt(i);
+    const blob = new Blob([bytes], { type: 'application/pdf' });
+    const url = URL.createObjectURL(blob);
+    // 1) PDF in neuem Tab öffnen (die finale Seite bleibt im Ausgangstab bestehen)
+    window.open(url, '_blank');
+    // 2) Dieselbe Datei zusätzlich im Hintergrund herunterladen
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    // Object-URL erst spät freigeben, damit neuer Tab und Download sicher fertig laden
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
   } catch (e) {
     console.error('Overview PDF generation failed:', e);
     alert('Konnte die Datei „Überblick deiner Antworten & Erläuterungen" nicht erzeugen: ' + e.message);

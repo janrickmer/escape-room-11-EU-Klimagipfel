@@ -4514,15 +4514,6 @@ function renderFinal() {
   `;
 }
 
-window.copyCode = async () => {
-  try {
-    await navigator.clipboard.writeText(state.code);
-    document.getElementById('copyDesc').innerHTML = '<strong style="color:var(--c-success)">✓ In die Zwischenablage kopiert.</strong> Trage den Code jetzt in Moodle ein.';
-  } catch (e) {
-    document.getElementById('copyDesc').innerHTML = `Code: <strong class="font-mono" style="color:var(--c-gold)">${state.code}</strong> – bitte manuell kopieren.`;
-  }
-};
-
 /* ============================================================
    PDF 2 — Reflexions-Datei (dynamisch erzeugt)
    ============================================================ */

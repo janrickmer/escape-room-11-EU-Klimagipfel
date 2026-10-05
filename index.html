@@ -5845,6 +5845,7 @@ function renderFinal() {
   state.screen = 'final';
   if (!state.completedAt) state.completedAt = new Date();
   renderSeals();
+  window.scrollTo({ top: 0, behavior: 'instant' });
 
   // Count first-attempt errors
   const totalErrors = state.mistakes.reduce((a, m) => a + (m && m.errors ? m.errors.length : 0), 0);
